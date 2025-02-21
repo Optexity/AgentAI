@@ -12,7 +12,12 @@ def main():
         "lawyersaathi-v0",
         "https://lawyersaathi.com",
         EnvTypes.browser,
-        [ObsProcessorTypes.html, ObsProcessorTypes.axtree],
+        [
+            ObsProcessorTypes.html,
+            ObsProcessorTypes.axtree,
+            ObsProcessorTypes.screenshot,
+            ObsProcessorTypes.som,
+        ],
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
 

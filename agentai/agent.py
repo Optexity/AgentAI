@@ -71,10 +71,15 @@ class BasicAgent:
                 {"role": "user", "content": get_user_prompt(obs)},
             ],
         )
+        # import pdb
+
+        # pdb.set_trace()
 
         return response.choices[0].message.content
 
-    def parse_model_response(self, response: str) -> tuple[ActionTypes, list[str]]:
+    def parse_model_response(
+        self, response: str
+    ) -> tuple[ActionTypes, list[str | int]]:
         try:
             pattern = r"\`\`\`(\w+)\((.*?)\)\`\`\`"
             match = re.search(pattern, response)
