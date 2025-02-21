@@ -1,5 +1,5 @@
 import gymnasium as gym
-from computergym import make_env
+from computergym import ActionTypes, EnvTypes, ObsProcessorTypes, make_env
 
 
 def get_action(obs: dict):
@@ -8,11 +8,26 @@ def get_action(obs: dict):
 
 def main():
     env = make_env(
-        "OpenEndedWebsite-v0", "browser", ["obs_processor_1", "obs_processor_2"]
+        "lawyersaathi-v0",
+        "https://lawyersaathi.com",
+        EnvTypes.browser,
+        [ObsProcessorTypes.html, ObsProcessorTypes.axtree],
     )
 
-    obs, truncated, terminated = env.reset()
-    while not terminated and not truncated:
+    obs, info = env.reset()
+
+    import pdb
+
+    pdb.set_trace()
+    while True:
+        print(obs[ObsProcessorTypes.axtree])
         action = get_action(obs)
         obs, reward, terminated, truncated, info = env.step(action)
-        env.render()
+        if terminated or truncated:
+            break
+    # release the environment
+    env.close()
+
+
+if __name__ == "__main__":
+    main()
