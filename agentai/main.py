@@ -1,4 +1,5 @@
 import gymnasium as gym
+from agent import BasicAgent
 from computergym import ActionTypes, EnvTypes, ObsProcessorTypes, make_env
 
 
@@ -13,16 +14,15 @@ def main():
         EnvTypes.browser,
         [ObsProcessorTypes.html, ObsProcessorTypes.axtree],
     )
+    agent = BasicAgent("basic_agent", env, "basic_agent")
 
     obs, info = env.reset()
 
-    import pdb
-
-    pdb.set_trace()
     while True:
-        print(obs[ObsProcessorTypes.axtree])
-        action = get_action(obs)
-        obs, reward, terminated, truncated, info = env.step(action)
+        action_type, action_params = agent.get_next_action(obs)
+        print(action_type)
+        print(action_params)
+        obs, reward, terminated, truncated, info = env.step(action_type, action_params)
         if terminated or truncated:
             break
     # release the environment

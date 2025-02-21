@@ -8,7 +8,7 @@ to find the best possible next action to accomplish your goal. Your answer will 
 and executed by a program, make sure to follow the formatting instructions."""
 
 
-action_description = """Here are examples of actions with chain-of-thought reasoning:
+example_actions = """Here are examples of actions with chain-of-thought reasoning:
 
 I now need to click on the Submit button to send the form. I will use the click action on the button, which has bid 12.
 ```click("12")```
@@ -23,4 +23,4 @@ format_instruction = """You should first provide chain-of-thought reasoning to e
 You can see examples of actions in the action description section.
 """
 
-next_action = """You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, and the current state of the page before deciding on your next action."""
+next_action = """You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, the current state of the page and the task in hand before deciding on your next action."""
