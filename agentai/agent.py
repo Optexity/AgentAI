@@ -1,9 +1,7 @@
 import re
 
-import gymnasium as gym
 from computergym import (
     ActionTypes,
-    EnvTypes,
     ObsProcessorTypes,
     OpenEndedWebsite,
     get_action_description,
@@ -47,7 +45,7 @@ def get_system_prompt(action_space: list[ActionTypes]) -> str:
     return prompt
 
 
-def get_user_prompt(obs: dict, task: str) -> str:
+def get_user_prompt(obs: dict) -> str:
     prompt = f"""
     # AXTree Observation:
     {obs[ObsProcessorTypes.axtree]}
@@ -70,9 +68,12 @@ class BasicAgent:
             model="gemini/gemini-2.0-flash",
             messages=[
                 {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": get_user_prompt(obs, "signin")},
+                {"role": "user", "content": get_user_prompt(obs)},
             ],
         )
+        import pdb
+
+        pdb.set_trace()
         return response.choices[0].message.content
 
     def parse_model_response(self, response: str) -> tuple[ActionTypes, list[str]]:
