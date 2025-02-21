@@ -18,6 +18,7 @@ def main():
             ObsProcessorTypes.screenshot,
             ObsProcessorTypes.som,
         ],
+        cache_dir="./cached_data",
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
 
