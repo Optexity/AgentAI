@@ -71,9 +71,6 @@ class BasicAgent:
                 {"role": "user", "content": get_user_prompt(obs)},
             ],
         )
-        # import pdb
-
-        # pdb.set_trace()
 
         return response.choices[0].message.content
 
@@ -104,9 +101,3 @@ class BasicAgent:
         model_response = self.get_model_response(obs)
         action_type, action_params = self.parse_model_response(model_response)
         return action_type, action_params
-
-    def act(self, action: str):
-        print(f"{self.name} is performing action: {action}")
-
-    def respond(self, response: str):
-        print(f"{self.name} responds with: {response}")

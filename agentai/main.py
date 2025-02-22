@@ -1,14 +1,9 @@
-import gymnasium as gym
 from agent import BasicAgent
-from computergym import ActionTypes, EnvTypes, ObsProcessorTypes, make_env
-
-
-def get_action(obs: dict):
-    return 0
+from computergym import EnvTypes, ObsProcessorTypes, OpenEndedWebsite, make_env
 
 
 def main():
-    env = make_env(
+    env: OpenEndedWebsite = make_env(
         "lawyersaathi-v0",
         "https://lawyersaathi.com",
         EnvTypes.browser,
