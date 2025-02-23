@@ -7,7 +7,8 @@ from computergym import EnvTypes, ObsProcessorTypes, OpenEndedWebsite, make_env
 def main():
     env: OpenEndedWebsite = make_env(
         "lawyersaathi-v0",
-        "https://lawyersaathi.com",
+        # "https://lawyersaathi.com",
+        "https://dev283325.service-now.com/now/nav/ui/classic/params/target/catalog_home.do%3Fsysparm_view%3Dcatalog_default",
         EnvTypes.browser,
         [
             ObsProcessorTypes.html,
@@ -19,7 +20,7 @@ def main():
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
 
-    obs, info = env.reset()
+    obs, info = env.reset_()
     action = None
     while True:
         print("Observation:")
@@ -35,7 +36,7 @@ def main():
         # print(action_type)
         # print(action_params)
         # # obs, reward, terminated, truncated, info = env.step(action_type, action_params)
-        obs, reward, terminated, truncated, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step_(action)
 
         if terminated or truncated:
             break
