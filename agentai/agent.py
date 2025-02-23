@@ -1,6 +1,5 @@
 import json
 import os
-import re
 
 import google.generativeai as genai
 import instructor
@@ -11,32 +10,12 @@ from computergym import (
     get_action_object,
     get_action_signature,
 )
-from prompts import example_actions, format_instruction, instruction_prompt, next_action
-from pydantic import BaseModel, Field
+from computergym.actions.action import ActionTypes
+from prompts import Response, example_actions, instruction_prompt, next_action
+from pydantic import BaseModel
 
 
-class Response(BaseModel):
-    """
-    The response format for the action to take. Think step-by-step through the action you want to take.
-    """
-
-    reasoning: str = Field(description="Your reasoning for taking this action.")
-    action_name: str = Field(
-        description="The action_name should be one of the available actions"
-    )
-    action_params: dict = Field(
-        description="""The parameters of the action you want to take. Must be valid JSON. 
-        The action_params should be valid for that action.
-        The action_params should be a dictionary with the parameters of the action.
-            {
-            "param1": "value1",
-            "param2": "value2"
-        }
-        """
-    )
-
-
-def get_action_prompt(action_type: ActionTypes) -> str:
+def get_action_prompt(action_type: ActionTypes) -> dict:
     name = action_type.value
     description = get_action_signature(action_type)
     description["action_name"] = name
@@ -46,7 +25,7 @@ def get_action_prompt(action_type: ActionTypes) -> str:
 def get_action_space_prompt(action_space: list[ActionTypes]) -> str:
     prompt = ""
     for i, action in enumerate(action_space):
-        prompt += f"Action {i}\n{get_action_prompt(action)}\n"
+        prompt += f"Action {i}\n{json.dumps(get_action_prompt(action),indent=4)}\n"
     return prompt
 
 
@@ -95,6 +74,9 @@ class BasicAgent:
         )
 
     def get_model_response(self, obs: dict) -> Response:
+        import pdb
+
+        pdb.set_trace()
         response: Response = self.client.create(
             response_model=Response,
             messages=[
