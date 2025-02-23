@@ -20,10 +20,12 @@ def main():
     agent = BasicAgent("basic_agent", env, "basic_agent")
 
     obs, info = env.reset()
-
+    action = None
     while True:
-        action = agent.get_next_action(obs)
-
+        model_response, action = agent.get_next_action(obs)
+        print("Model response:")
+        pprint(model_response)
+        print("Action:")
         pprint(action)
         # obs, reward, terminated, truncated, info = env.step(action)
         # action_type, action_params = agent.get_next_action(obs)

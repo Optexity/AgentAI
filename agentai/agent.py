@@ -62,6 +62,7 @@ class BasicAgent:
         self.agent_description = agent_description
         self.action_space = env.get_action_space()
         self.system_prompt = get_system_prompt(self.action_space)
+        self.response_history: list[Response] = []
 
         self.llm_model_name = "models/gemini-2.0-flash"
 
@@ -71,13 +72,21 @@ class BasicAgent:
             mode=instructor.Mode.GEMINI_JSON,
         )
 
+    def get_history_messages(self) -> list[dict]:
+        messages = []
+        for i, response in enumerate(self.response_history):
+            messages.append({"role": "user", "content": next_action})
+            messages.append(
+                {"role": "assistant", "content": response.model_dump_json(indent=4)}
+            )
+        return messages
+
     def get_model_response(self, obs: dict) -> Response:
         response: Response = self.client.create(
             response_model=Response,
-            messages=[
-                {"role": "system", "content": self.system_prompt},
-                {"role": "user", "content": get_user_prompt(obs)},
-            ],
+            messages=[{"role": "system", "content": self.system_prompt}]
+            + self.get_history_messages()
+            + [{"role": "user", "content": get_user_prompt(obs)}],
         )
 
         return response
@@ -90,7 +99,8 @@ class BasicAgent:
         action = action_object.model_validate(action_params)
         return action
 
-    def get_next_action(self, obs: str) -> BaseModel:
+    def get_next_action(self, obs: str) -> tuple[Response, BaseModel]:
         model_response = self.get_model_response(obs)
+        self.response_history.append(model_response)
         action = self.parse_model_response(model_response)
-        return action
+        return model_response, action
