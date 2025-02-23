@@ -72,9 +72,6 @@ class BasicAgent:
         )
 
     def get_model_response(self, obs: dict) -> Response:
-        import pdb
-
-        pdb.set_trace()
         response: Response = self.client.create(
             response_model=Response,
             messages=[
@@ -82,6 +79,7 @@ class BasicAgent:
                 {"role": "user", "content": get_user_prompt(obs)},
             ],
         )
+
         return response
 
     def parse_model_response(self, model_response: Response) -> BaseModel:

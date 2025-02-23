@@ -1,10 +1,4 @@
-from computergym.actions.action import (
-    ActionTypes,
-    ClickAction,
-    InputText,
-    ScrollAction,
-    action_examples,
-)
+from computergym.actions.action import ActionTypes, action_examples
 from pydantic import BaseModel, Field
 
 
