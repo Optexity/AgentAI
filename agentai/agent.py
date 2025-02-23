@@ -67,9 +67,7 @@ class BasicAgent:
 
         genai.configure(api_key=os.environ["GEMINI_API_KEY"])
         self.client = instructor.from_gemini(
-            client=genai.GenerativeModel(
-                model_name="models/gemini-2.0-flash",  # model defaults to "gemini-pro"
-            ),
+            client=genai.GenerativeModel(model_name=self.llm_model_name),
             mode=instructor.Mode.GEMINI_JSON,
         )
 

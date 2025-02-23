@@ -1,4 +1,10 @@
-from computergym.actions.action import ActionTypes, ClickAction, InputText, ScrollAction
+from computergym.actions.action import (
+    ActionTypes,
+    ClickAction,
+    InputText,
+    ScrollAction,
+    action_examples,
+)
 from pydantic import BaseModel, Field
 
 
@@ -23,19 +29,16 @@ class Response(BaseModel):
     )
 
 
-click_example = ClickAction(element_id="12")
-input_text_example = InputText(element_id="12", value="Hello world!")
-
 click_example_response = Response(
     reasoning="I need to click on the Submit button to send the form. I will use the click action on the button, which has bid 12.",
     action_name=ActionTypes.click.value,
-    action_params=click_example.model_dump(),
+    action_params=action_examples[ActionTypes.click].model_dump(),
 )
 
 input_text_example_response = Response(
     reasoning="I need to enter text in text field with bid 12. I will use the input_text action.",
     action_name=ActionTypes.input_text.value,
-    action_params=input_text_example.model_dump(),
+    action_params=action_examples[ActionTypes.input_text].model_dump(),
 )
 
 instruction_prompt = """You are a UI Assistant, your goal is to help the user perform tasks using a web browser. You can
