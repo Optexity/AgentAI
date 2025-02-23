@@ -11,6 +11,7 @@ from computergym import (
     get_action_signature,
 )
 from computergym.actions.action import ActionTypes
+from PIL import Image
 from prompts import Response, example_actions, instruction_prompt, next_action
 from pydantic import BaseModel
 
@@ -39,20 +40,25 @@ def get_system_prompt(action_space: list[ActionTypes]) -> str:
 
     # Example actions:
     {example_actions}
-    
-    {next_action}
     """
     return prompt
 
 
-def get_user_prompt(obs: dict) -> str:
-    prompt = f"""
-    # AXTree Observation:
-    {obs[ObsProcessorTypes.axtree]}
+def get_user_prompt(obs: dict, obs_type: ObsProcessorTypes) -> str:
 
-    # Task:
-    {obs['chat_messages'][-1]['message']}
-    """
+    if obs_type == ObsProcessorTypes.som:
+        pil_image = Image.fromarray(obs[ObsProcessorTypes.som])
+        return [
+            "Current screenshot of the webpage. Use the number on the items to extract bid",
+            pil_image,
+        ]
+
+    if obs[ObsProcessorTypes.axtree]:
+        return f"""Current AXTree of the webpage. Use the number on the items to extract bid.\n{obs[ObsProcessorTypes.axtree]}"""
+
+
+def get_final_prompt(obs: dict):
+    prompt = f"Task: {next_action}\n{obs['chat_messages'][-1]['message']}"
     return prompt
 
 
@@ -86,7 +92,8 @@ class BasicAgent:
             response_model=Response,
             messages=[{"role": "system", "content": self.system_prompt}]
             + self.get_history_messages()
-            + [{"role": "user", "content": get_user_prompt(obs)}],
+            + [{"role": "user", "content": get_user_prompt(obs, ObsProcessorTypes.som)}]
+            + [{"role": "user", "content": get_final_prompt(obs)}],
         )
 
         return response

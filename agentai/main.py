@@ -22,6 +22,8 @@ def main():
     obs, info = env.reset()
     action = None
     while True:
+        print("Observation:")
+        print(obs[ObsProcessorTypes.axtree])
         model_response, action = agent.get_next_action(obs)
         print("Model response:")
         pprint(model_response)
@@ -34,6 +36,7 @@ def main():
         # print(action_params)
         # # obs, reward, terminated, truncated, info = env.step(action_type, action_params)
         obs, reward, terminated, truncated, info = env.step(action)
+
         if terminated or truncated:
             break
     # release the environment
