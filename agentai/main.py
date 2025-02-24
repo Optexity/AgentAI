@@ -8,6 +8,9 @@ from computergym import (
     OpenEndedWebsite,
     make_env,
 )
+from utils import get_logger
+
+logger = get_logger(__name__, log_path="./logs")
 
 
 def main():
@@ -23,26 +26,24 @@ def main():
             ObsProcessorTypes.screenshot,
             ObsProcessorTypes.som,
         ],
-        cache_dir="./cached_data",
+        cache_dir="./logs",
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
 
     obs, info = env.reset()
     action = None
     while True:
+        logger.info("-" * 20)
+        logger.info(f"step: {env.current_step}")
         model_response, action = agent.get_next_action(obs)
-        print("Model response:")
-        pprint(model_response)
-        print("Action:")
-        pprint(action)
-        # obs, reward, terminated, truncated, info = env.step(action)
-        # action_type, action_params = agent.get_next_action(obs)
-        # action = Action(action_type, action_params)
-        # print(action_type)
-        # print(action_params)
-        # # obs, reward, terminated, truncated, info = env.step(action_type, action_params)
+        logger.info(f"model_response: {model_response}")
+        string = action.model_dump()
+        string["action_name"] = action.__class__.__name__
+        logger.info(f"action: {string}")
         obs, reward, terminated, truncated, info = env.step(action)
-
+        logger.info(
+            f"reward: {reward}, terminated: {terminated}, truncated: {truncated}"
+        )
         if terminated or truncated:
             break
     # release the environment

@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 
 import google.generativeai as genai
@@ -14,6 +15,8 @@ from computergym.actions.action import ActionTypes
 from PIL import Image
 from prompts import Response, example_actions, instruction_prompt, next_action
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 
 def get_action_prompt(action_type: ActionTypes) -> dict:
