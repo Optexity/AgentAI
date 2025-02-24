@@ -76,6 +76,16 @@ def get_final_prompt(obs: dict):
     return prompt
 
 
+def get_last_error(obs: dict) -> str:
+    if obs["last_action_error"] is None:
+        return []
+    content = f"""
+    # Previous error message
+    {obs['last_action_error']}
+    """
+    return [{"role": "user", "content": content}]
+
+
 class BasicAgent:
     def __init__(self, name: str, env: OpenEndedWebsite, agent_description: str):
         self.name = name
@@ -101,13 +111,21 @@ class BasicAgent:
             )
         return messages
 
+    def get_user_input(self) -> str:
+        user_input = input("Enter your input: ").lower().strip()
+        if user_input.lower() == "":
+            return []
+        return [{"role": "user", "content": user_input}]
+
     def get_model_response(self, obs: dict) -> Response:
         response: Response = self.client.create(
             response_model=Response,
             messages=[{"role": "system", "content": self.system_prompt}]
             + self.get_history_messages()
             + get_axtree_prompt(obs)
-            + get_som_prompt(obs)
+            # + get_som_prompt(obs)
+            # + self.get_user_input()
+            + get_last_error(obs)
             + [{"role": "user", "content": get_final_prompt(obs)}],
         )
 
