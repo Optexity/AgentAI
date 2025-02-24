@@ -47,17 +47,28 @@ def get_system_prompt(action_space: list[ActionTypes]) -> str:
     return prompt
 
 
-def get_user_prompt(obs: dict, obs_type: ObsProcessorTypes) -> str:
+def get_som_prompt(obs: dict) -> str:
 
-    if obs_type == ObsProcessorTypes.som:
+    if ObsProcessorTypes.som in obs:
+
         pil_image = Image.fromarray(obs[ObsProcessorTypes.som])
-        return [
-            "Current screenshot of the webpage. Use the number on the items to extract bid",
+        content = [
+            "Current screenshot of the webpage. Use the number on the items to extract bid. The numbers are the IDs of the elements in the AXTree.\n",
             pil_image,
         ]
+        return [{"role": "user", "content": content}]
+    return []
 
-    if obs[ObsProcessorTypes.axtree]:
-        return f"""Current AXTree of the webpage. Use the number on the items to extract bid.\n{obs[ObsProcessorTypes.axtree]}"""
+
+def get_axtree_prompt(obs: dict) -> str:
+
+    if ObsProcessorTypes.axtree in obs:
+        content = [
+            f"""Current AXTree of the webpage. Use the number on the items to extract bid.\n""",
+            f"{obs[ObsProcessorTypes.axtree]}\n",
+        ]
+        return [{"role": "user", "content": content}]
+    return []
 
 
 def get_final_prompt(obs: dict):
@@ -95,7 +106,8 @@ class BasicAgent:
             response_model=Response,
             messages=[{"role": "system", "content": self.system_prompt}]
             + self.get_history_messages()
-            + [{"role": "user", "content": get_user_prompt(obs, ObsProcessorTypes.som)}]
+            + get_axtree_prompt(obs)
+            + get_som_prompt(obs)
             + [{"role": "user", "content": get_final_prompt(obs)}],
         )
 
