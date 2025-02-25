@@ -10,6 +10,7 @@ from computergym import (
     OpenEndedWebsite,
     make_env,
 )
+from tqdm import tqdm
 from utils import get_logger
 
 
@@ -65,7 +66,7 @@ def run(task: AbstractServiceNowTask, log_path="./logs"):
 def main():
     total_tasks = 0
     total_reward = 0
-    for seed in range(10):
+    for seed in tqdm(range(10)):
         for task_entrypoint in SERVICE_CATALOG_TASKS:
             task = task_entrypoint(seed=seed)
             log_path = os.path.join(
