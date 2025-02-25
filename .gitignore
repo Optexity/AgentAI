@@ -1,5 +1,6 @@
 cached_data/
 logs/
+logs-old/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 
 def get_logger(
@@ -9,13 +10,46 @@ def get_logger(
     log_to_console: bool = True,
     log_path: str = None,
 ):
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
 
-    handlers = []
-    if log_file:
+    # Remove any existing handlers to avoid duplicate logs
+    if logger.hasHandlers():
+        logger.handlers.clear()
+
+    # Create log directory if it doesn't exist
+    if log_path:
         os.makedirs(log_path, exist_ok=True)
-        handlers.append(logging.FileHandler(os.path.join(log_path, log_file)))
+
+    # Log format
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s - %(message)s"
+    )
+
+    # File handler (logs errors to file)
+    if log_file and log_path:
+        file_handler = logging.FileHandler(os.path.join(log_path, log_file))
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(level)  # Ensure it captures all logs
+        logger.addHandler(file_handler)
+
+    # Console handler (optional)
     if log_to_console:
-        handlers.append(logging.StreamHandler())
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        console_handler.setLevel(level)  # Ensure it captures all logs
+        logger.addHandler(console_handler)
+
+    # Ensure uncaught exceptions go to all handlers
+    def exception_handler(exc_type, exc_value, exc_traceback):
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+            return
+        logger.exception(
+            "Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback)
+        )
+
+    sys.excepthook = exception_handler
 
     try:
         logging.getLogger("requests").setLevel(logging.WARNING)
@@ -23,11 +57,4 @@ def get_logger(
     except Exception as e:
         pass
 
-    logging.basicConfig(
-        level=level,  # Set the logging level
-        format="%(asctime)s - %(name)s - %(levelname)s - %(funcName)s - %(message)s",
-        handlers=handlers,
-    )
-
-    logger = logging.getLogger(name)
     return logger

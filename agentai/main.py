@@ -16,7 +16,7 @@ from utils import get_logger
 
 def run(task: AbstractServiceNowTask, log_path="./logs"):
 
-    logger = get_logger(__name__, log_path=log_path)
+    logger = get_logger(__name__, log_path=log_path, log_to_console=False)
 
     goal, _ = task.setup_goal(None)
     logger.info(f"Goal: {goal}")
@@ -33,6 +33,7 @@ def run(task: AbstractServiceNowTask, log_path="./logs"):
         ],
         cache_dir=log_path,
         goal_message=goal,
+        headless=True,
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
 
@@ -67,7 +68,7 @@ def main():
     total_tasks = 0
     total_reward = 0
     for seed in tqdm(range(10)):
-        for task_entrypoint in SERVICE_CATALOG_TASKS:
+        for task_entrypoint in tqdm(SERVICE_CATALOG_TASKS):
             task = task_entrypoint(seed=seed)
             log_path = os.path.join(
                 "./logs", task_entrypoint.__name__, f"seed-{str(seed)}"
