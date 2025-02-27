@@ -5,9 +5,9 @@ import os
 def main(path: str):
     total = 0
     correct = 0
-    for task in os.listdir(path):
+    for task in sorted(os.listdir(path)):
         task_path = os.path.join(path, task)
-        for seed in os.listdir(task_path):
+        for seed in sorted(os.listdir(task_path)):
             seed_path = os.path.join(task_path, seed)
             if os.path.isdir(seed_path):
                 for file in os.listdir(seed_path):
@@ -17,6 +17,8 @@ def main(path: str):
                         total += 1
                         if "Final Reward: 1" in content:
                             correct += 1
+                        else:
+                            print(f"Incorrect: {task} {seed}")
 
     print(f"Total: {total}")
     print(f"Correct: {correct}")

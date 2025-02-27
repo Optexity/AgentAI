@@ -13,7 +13,13 @@ from computergym import (
 )
 from computergym.actions.action import ActionTypes
 from PIL import Image
-from prompts import Response, example_actions, instruction_prompt, next_action
+from prompts import (
+    Response,
+    example_actions,
+    instruction_prompt,
+    next_action,
+    trajectories,
+)
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
@@ -44,6 +50,12 @@ def get_system_prompt(action_space: list[ActionTypes]) -> str:
     # Example actions:
     {example_actions}
     """
+
+    trajectories_str = f"""\n
+    # Example trajectories:
+     {trajectories}
+    """
+    prompt += trajectories_str
     return prompt
 
 

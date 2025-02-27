@@ -60,3 +60,10 @@ Input Text Example:
 
 
 next_action = """You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, the current state of the page and the task in hand before deciding on your next action."""
+
+with open("./example_trajectory1.txt", "r") as f:
+    example_trajectory1 = f.read()
+with open("./example_trajectory2.txt", "r") as f:
+    example_trajectory2 = f.read()
+
+trajectories = f"You are being provided with trajectories from the browser. These are the actions that are good to solve a similar task. Ofcourse never use the exact same bid form this trajectory. You can use the reasoning and action_name to help you decide on your next action. Also note the task is similar and not exactly same, so you need to be careful and only use actions which are good for your task. Here are the trajectories:\n\n {example_trajectory1}"
