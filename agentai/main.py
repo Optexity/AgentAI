@@ -36,7 +36,7 @@ def run(task: AbstractServiceNowTask, log_path="./logs"):
         ],
         cache_dir=log_path,
         goal_message=goal,
-        headless=False,
+        headless=True,
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
 
@@ -94,4 +94,7 @@ if __name__ == "__main__":
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--task_num", type=int, required=True)
     args = parser.parse_args()
-    main(args)
+    try:
+        main(args)
+    except Exception as e:
+        print(f"Error: {e}")
