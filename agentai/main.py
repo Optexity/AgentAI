@@ -16,9 +16,9 @@ from computergym.utils import save_str_obs
 from utils import get_logger
 
 
-def run(task: AbstractServiceNowTask, log_path="./logs"):
+def run(task: AbstractServiceNowTask, log_path="./logs", log_to_console=False):
 
-    logger = get_logger(__name__, log_path=log_path, log_to_console=False)
+    logger = get_logger(__name__, log_path=log_path, log_to_console=log_to_console)
 
     goal, _ = task.setup_goal(None)
     logger.info(f"Goal: {goal}")
@@ -35,7 +35,7 @@ def run(task: AbstractServiceNowTask, log_path="./logs"):
         ],
         cache_dir=log_path,
         goal_message=goal,
-        headless=True,
+        headless=False,
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
 
@@ -84,7 +84,7 @@ def main(args):
         args.log_path, task_entrypoint.__name__, f"seed-{str(args.seed)}"
     )
     os.makedirs(log_path, exist_ok=True)
-    reward = run(task, log_path)
+    reward = run(task, log_path, args.log_to_console)
 
 
 if __name__ == "__main__":
@@ -92,6 +92,7 @@ if __name__ == "__main__":
     parser.add_argument("--log_path", type=str, default="./logs")
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--task_num", type=int, required=True)
+    parser.add_argument("--log_to_console", action="store_true", default=False)
     args = parser.parse_args()
     try:
         main(args)

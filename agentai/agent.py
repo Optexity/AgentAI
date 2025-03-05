@@ -1,9 +1,6 @@
 import json
 import logging
-import os
 
-import google.generativeai as genai
-import instructor
 from computergym import (
     ActionTypes,
     ObsProcessorTypes,
@@ -12,6 +9,7 @@ from computergym import (
     get_action_signature,
 )
 from computergym.actions.action import ActionTypes
+from models import LLMModelType, get_llm_model
 from PIL import Image
 from prompts import (
     Response,
@@ -106,13 +104,7 @@ class BasicAgent:
         self.system_prompt = get_system_prompt(self.action_space)
         self.response_history: list[Response] = []
 
-        self.llm_model_name = "models/gemini-2.0-flash"
-
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        self.client = instructor.from_gemini(
-            client=genai.GenerativeModel(model_name=self.llm_model_name),
-            mode=instructor.Mode.GEMINI_JSON,
-        )
+        self.model = get_llm_model("models/gemini-2.0-flash", LLMModelType.GEMINI)
 
     def get_history_messages(self) -> list[dict]:
         messages = []
@@ -129,19 +121,18 @@ class BasicAgent:
             return []
         return [{"role": "user", "content": user_input}]
 
-    def get_model_response(self, obs: dict) -> Response:
-        response: Response = self.client.create(
-            response_model=Response,
-            messages=[{"role": "system", "content": self.system_prompt}]
+    def get_input_messages(self, obs: dict) -> list[dict]:
+        messages = (
+            [{"role": "system", "content": self.system_prompt}]
             + self.get_history_messages()
             + get_axtree_prompt(obs)
             # + get_som_prompt(obs)
             # + self.get_user_input()
             + get_last_error(obs)
-            + [{"role": "user", "content": get_final_prompt(obs)}],
+            + [{"role": "user", "content": get_final_prompt(obs)}]
         )
 
-        return response
+        return messages
 
     def parse_model_response(self, model_response: Response) -> BaseModel:
         action_name = model_response.action_name
@@ -152,7 +143,8 @@ class BasicAgent:
         return action
 
     def get_next_action(self, obs: str) -> tuple[Response, BaseModel]:
-        model_response = self.get_model_response(obs)
+        input_messages = self.get_input_messages(obs)
+        model_response = self.model.get_model_response(input_messages)
         self.response_history.append(model_response)
         action = self.parse_model_response(model_response)
         return model_response, action
