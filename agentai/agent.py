@@ -9,7 +9,7 @@ from computergym import (
     get_action_signature,
 )
 from computergym.actions.action import ActionTypes
-from models import LLMModelType, get_llm_model
+from models import GeminiModels, LLMModelType, VLLMModels, get_llm_model
 from prompts.prompts import system_prompt, user_prompt
 from prompts.utils import PromptKeys, PromptStyle, Response, Roles, style
 from pydantic import BaseModel
@@ -46,9 +46,9 @@ def get_system_prompt(keys: list[PromptKeys], action_space: list[ActionTypes]) -
         st = style[PromptKeys.INSTRUCTION]
         prompt += f"{st[PromptStyle.BEGIN]}\n{system_prompt[PromptKeys.INSTRUCTION]}\n{st[PromptStyle.END]}\n\n"
 
-    if PromptKeys.RESPONSE_JSON_DESCRIPTION in keys:
-        st = style[PromptKeys.RESPONSE_JSON_DESCRIPTION]
-        prompt += f"{st[PromptStyle.BEGIN]}\n{json.dumps(system_prompt[PromptKeys.RESPONSE_JSON_DESCRIPTION], indent=4)}\n{st[PromptStyle.END]}\n\n"
+    # if PromptKeys.RESPONSE_JSON_DESCRIPTION in keys:
+    #     st = style[PromptKeys.RESPONSE_JSON_DESCRIPTION]
+    #     prompt += f"{st[PromptStyle.BEGIN]}\n{json.dumps(system_prompt[PromptKeys.RESPONSE_JSON_DESCRIPTION], indent=4)}\n{st[PromptStyle.END]}\n\n"
 
     if PromptKeys.FORMAT_INSTRUCTION in keys:
         st = style[PromptKeys.FORMAT_INSTRUCTION]
@@ -103,9 +103,13 @@ class BasicAgent:
         )
         self.response_history: list[Response] = []
 
-        # self.model = get_llm_model("models/gemini-2.0-flash", LLMModelType.GEMINI)
+        # self.model = get_llm_model(
+        #     GeminiModels.GEMINI_2_0_FLASH, LLMModelType.GEMINI, use_instructor=False
+        # )
         self.model = get_llm_model(
-            "meta-llama/Meta-Llama-3.1-8B-Instruct", LLMModelType.LLAMA_FACTORY_VLLM
+            VLLMModels.LLAMA_3_1_8B_INSTRUCT,
+            LLMModelType.LLAMA_FACTORY_VLLM,
+            use_instructor=False,
         )
 
     def get_history_messages(self) -> list[dict]:
@@ -140,13 +144,8 @@ class BasicAgent:
         return action
 
     def get_next_action(self, obs: str) -> tuple[Response, BaseModel]:
-        print("here1")
         input_messages = self.get_input_messages(obs)
-        print("here2")
         model_response = self.model.get_model_response(input_messages)
-        print("here3")
         self.response_history.append(model_response)
-        print("here4")
         action = self.parse_model_response(model_response)
-        print("here5")
         return model_response, action

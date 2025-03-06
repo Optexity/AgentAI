@@ -1,6 +1,6 @@
 from computergym.actions.action import ActionTypes, action_examples
 
-from .utils import PromptKeys, PromptStyle, Response, style
+from .utils import Response
 
 click_example_response = Response(
     observation="The current page looks like a homepage with signin button relevant for this task.",
@@ -25,7 +25,24 @@ Review the instructions from the user, the current state of the page and all oth
 to find the best possible next action to accomplish your goal. Your answer will be interpreted
 and executed by a program, make sure to follow the formatting instructions."""
 
-format_instruction = f"""Only output the json object. Do not output anything other than the json object which should be directly parsable by pydantic."""
+format_instruction = """Only output the json object. Do not output anything other than the json object which should be directly parsable by pydantic. Output the json object in the following format:
+```json
+{
+    "observation": "Summary of the observation you are responding to. This is the current state of the page.",
+    "reasoning": "Your reasoning for taking this action.",
+    "action_name": "The action_name should be one of the available actions",
+    "action_params": The parameters of the action you want to take. Must be valid JSON. 
+        The action_params should be valid for that action.
+        The action_params should be a dictionary with the parameters of the action.
+            {
+            "param1": "value1",
+            "param2": "value2"
+        }
+}
+```
+"""
+
+# format_instruction = f"""Only output the json object. Do not output anything other than the json object which should be directly parsable by pydantic. Output the json object in the following format:\n```json\n{(Response.model_json_schema())}```\n"""
 
 
 next_action = """You will now think step by step and produce your next best action. Reflect on your past actions, any resulting error message, the current state of the page and the task in hand before deciding on your next action."""

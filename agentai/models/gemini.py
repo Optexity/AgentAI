@@ -1,26 +1,44 @@
+import ast
 import os
 
 import google.generativeai as genai
 import instructor
+import litellm
 from prompts.utils import Response
 
-from .llm_model import LLMModel, LLMModelType
+from .llm_model import GeminiModels, LLMModel, LLMModelType
 
 
 class Gemini(LLMModel):
-    def __init__(self, model_name: str):
-        super().__init__(model_name, LLMModelType.GEMINI)
+    def __init__(self, model_name: str, use_instructor: bool):
+        super().__init__(model_name, LLMModelType.GEMINI, use_instructor)
 
-        genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-        self.client = instructor.from_gemini(
-            client=genai.GenerativeModel(model_name=self.model_name),
-            mode=instructor.Mode.GEMINI_JSON,
-        )
+        if self.use_instructor:
+            self.model_name = f"models/{model_name}"
+            genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+            self.client = instructor.from_gemini(
+                client=genai.GenerativeModel(model_name=self.model_name),
+                mode=instructor.Mode.GEMINI_JSON,
+            )
+        else:
+            self.model_name = f"gemini/{model_name}"
 
     def get_model_response(self, messages: list[dict]) -> Response:
-        response: Response = self.client.create(
-            response_model=Response,
-            messages=messages,
-        )
+        if self.use_instructor:
+            response: Response = self.client.create(
+                response_model=Response, messages=messages
+            )
+        else:
+            try:
+                completion = litellm.completion(
+                    model=self.model_name, messages=messages
+                )
+                content = completion.choices[0].message.content
+                response = self.get_response_from_completion(content)
+
+            except Exception as e:
+                import pdb
+
+                pdb.set_trace()
 
         return response
