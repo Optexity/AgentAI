@@ -97,6 +97,7 @@ def main(input_dir: str):
                             {
                                 "system": system_message,
                                 "instruction": user_message,
+                                "input": "",
                                 "output": target,
                             }
                         )
