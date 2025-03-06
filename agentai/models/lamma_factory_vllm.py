@@ -13,15 +13,11 @@ class LlamaFactoryVllm(LLMModel):
         self.client = openai.OpenAI(base_url="http://0.0.0.0:8000/v1", api_key="dummy")
 
     def get_model_response(self, messages: list[dict]) -> Response:
-        try:
-            completion = self.client.chat.completions.create(
-                model=self.model_name, messages=messages
-            )
-            content = completion.choices[0].message.content
-            response = self.get_response_from_completion(content)
-        except Exception as e:
-            import pdb
 
-            pdb.set_trace()
+        completion = self.client.chat.completions.create(
+            model=self.model_name, messages=messages
+        )
+        content = completion.choices[0].message.content
+        response = self.get_response_from_completion(content)
 
         return response

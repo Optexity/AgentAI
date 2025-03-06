@@ -33,9 +33,26 @@ class LLMModel:
     def get_model_response(self, messages: list[dict]) -> Response:
         raise NotImplementedError("This method should be implemented by subclasses.")
 
+    def extract_json_objects(self, text):
+        stack = []  # Stack to track `{` positions
+        json_candidates = []  # Potential JSON substrings
+
+        # Iterate through the text to find balanced { }
+        for i, char in enumerate(text):
+            if char == "{":
+                stack.append(i)  # Store index of '{'
+            elif char == "}" and stack:
+                start = stack.pop()  # Get the last unmatched '{'
+                json_candidates.append(text[start : i + 1])  # Extract substring
+
+        return json_candidates
+
     def get_response_from_completion(self, content: str) -> Response:
-        pattern = r"```json\n(.*?)\n```"
-        json_blocks = re.findall(pattern, content, re.DOTALL)
+        patterns = [r"```json\n(.*?)\n```"]
+        json_blocks = []
+        for pattern in patterns:
+            json_blocks += re.findall(pattern, content, re.DOTALL)
+        json_blocks += self.extract_json_objects(content)
         for block in json_blocks:
             block = block.strip()
             try:
@@ -48,4 +65,7 @@ class LLMModel:
                     return response
                 except Exception as e:
                     continue
+        import pdb
+
+        pdb.set_trace()
         raise ValueError("Could not parse response from completion.")
