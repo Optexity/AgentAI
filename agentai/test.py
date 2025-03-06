@@ -1,63 +1,25 @@
-import random
-from time import sleep
+import openai
 
-from browsergym.core.env import BrowserEnv
-from browsergym.workarena import SERVICE_CATALOG_TASKS
+client = openai.OpenAI(
+    api_key="sk-1234",  # pass litellm proxy key, if you're using virtual keys
+    base_url="http://0.0.0.0:8000/v1",  # litellm-proxy-base url
+)
 
-random.shuffle(SERVICE_CATALOG_TASKS)
+response = client.chat.completions.create(
+    model="my-model",
+    messages=[{"role": "user", "content": "what llm are you"}],
+)
 
-for task in SERVICE_CATALOG_TASKS:
-    print("------------------")
-    print("Task:", task)
+print(response)
 
-    # Instantiate a new environment
-    env = BrowserEnv(task_entrypoint=task, headless=False)
-    env.reset()
+import litellm
 
-    # Cheat functions use Playwright to automatically solve the task
-    env.chat.add_message(role="assistant", msg="On it. Please wait...")
-    cheat_messages = []
-    env.task.cheat(env.page, cheat_messages)
+response = litellm.completion(
+    model="hosted_vllm/facebook/opt-125m",  # pass the vllm model name
+    messages=[{"role": "user", "content": "what llm are you"}],
+    api_base="http://0.0.0.0:8000/v1",
+    temperature=0.2,
+    max_tokens=80,
+)
 
-    # Send cheat messages to chat
-    for cheat_msg in cheat_messages:
-        env.chat.add_message(role=cheat_msg["role"], msg=cheat_msg["message"])
-
-    # Post solution to chat
-    env.chat.add_message(role="assistant", msg="I'm done!")
-
-    # Validate the solution
-    reward, stop, message, info = env.task.validate(env.page, cheat_messages)
-    if reward == 1:
-        env.chat.add_message(role="user", msg="Yes, that works. Thanks!")
-    else:
-        env.chat.add_message(
-            role="user", msg=f"No, that doesn't work. {info.get('message', '')}"
-        )
-    print(f"reward: {reward}, stop: {stop}, message: {message}, info: {info}")
-
-    sleep(3)
-    env.close()
-    # print("Task:", task)
-
-    # # Instantiate a new environment
-    # env = BrowserEnv(task_entrypoint=task,
-    #                 headless=False)
-    # env.reset()
-
-    # url = task.url
-    # goal = task.goal
-
-    # computerenv(url, goal)
-    # step
-    # done!
-
-    # # Validate the solution
-    # reward, stop, message, info = env.task.validate(computer.page, cheat_messages)
-    # if reward == 1:
-    #     env.chat.add_message(role="user", msg="Yes, that works. Thanks!")
-    # else:
-    #     env.chat.add_message(role="user", msg=f"No, that doesn't work. {info.get('message', '')}")
-
-    # sleep(3)
-    # env.close()
+print(response)

@@ -1,4 +1,4 @@
-from .llm_model import LLMModel, LLMModelType
+from .llm_model import LLMModelType
 
 
 def get_llm_model(model_name: str, model_type: LLMModelType):
@@ -6,9 +6,9 @@ def get_llm_model(model_name: str, model_type: LLMModelType):
         from .gemini import Gemini
 
         return Gemini(model_name)
-    elif model_type == LLMModelType.LiteLLM:
-        from .lite_llm import LiteLLM
+    elif model_type == LLMModelType.LLAMA_FACTORY_VLLM:
+        from .lamma_factory_vllm import LlamaFactoryVllm
 
-        return LiteLLM(model_name)
+        return LlamaFactoryVllm(model_name)
     else:
         raise ValueError(f"Invalid model type: {model_type}")

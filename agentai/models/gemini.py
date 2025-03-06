@@ -2,7 +2,7 @@ import os
 
 import google.generativeai as genai
 import instructor
-from prompts import Response
+from prompts.utils import Response
 
 from .llm_model import LLMModel, LLMModelType
 

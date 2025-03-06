@@ -9,6 +9,7 @@ class LLMModelType(Enum):
     AZURE = "azure"
     CUSTOM = "custom"
     LiteLLM = "LiteLLM"
+    LLAMA_FACTORY_VLLM = "llama_factory_vllm"
 
 
 class LLMModel:
