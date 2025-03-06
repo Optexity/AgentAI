@@ -50,6 +50,7 @@ def main(input_dir: str):
         headless=True,
     )
     agent = BasicAgent("basic_agent", env, "basic_agent")
+    full_data = []
     for task_type in os.listdir(input_dir):
         task_path = os.path.join(input_dir, task_type)
         if not os.path.isdir(task_path):
@@ -85,14 +86,20 @@ def main(input_dir: str):
                             ObsProcessorTypes.last_action_error: None,
                         }
                         messages = agent.get_input_messages(obs)
+                        system_message = messages[0]["content"]
+                        user_message = messages[1]["content"]
                         target = (
                             f"```json\n{action_response.model_dump_json(indent=4)}\n```"
                         )
 
                         agent.response_history.append(action_response)
-                        import pdb
-
-                        pdb.set_trace()
+                        full_data.append(
+                            {
+                                "system": system_message,
+                                "instruction": user_message,
+                                "output": target,
+                            }
+                        )
                     except Exception as e:
 
                         # print(os.path.join(step_path, "action.txt"))
@@ -102,6 +109,12 @@ def main(input_dir: str):
 
                         pdb.set_trace()
                         pass
+
+    with open(
+        "/Users/sankalp/repository/github/Reinforce-Align-AI/LLaMA-Factory/data/service_catalog.json",
+        "w",
+    ) as f:
+        json.dump(full_data, f, indent=4)
 
 
 if __name__ == "__main__":
