@@ -101,7 +101,6 @@ def main(input_dir: str):
                             }
                         )
                     except Exception as e:
-
                         # print(os.path.join(step_path, "action.txt"))
                         # print(action_response)
                         print(f"Error in {step_path}: {e}")
@@ -110,10 +109,8 @@ def main(input_dir: str):
                         pdb.set_trace()
                         pass
 
-    with open(
-        "/Users/sankalp/repository/github/Reinforce-Align-AI/LLaMA-Factory/data/service_catalog.json",
-        "w",
-    ) as f:
+    os.makedirs("./train_data/SERVICE_CATALOG_TASKS", exist_ok=True)
+    with open("./train_data/SERVICE_CATALOG_TASKS/data.json", "w") as f:
         json.dump(full_data, f, indent=4)
 
 
