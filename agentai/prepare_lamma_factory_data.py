@@ -110,7 +110,9 @@ def main(input_dir: str):
                         pass
 
     os.makedirs("./train_data/SERVICE_CATALOG_TASKS", exist_ok=True)
-    with open("./train_data/SERVICE_CATALOG_TASKS/data.json", "w") as f:
+    with open(
+        "./train_data/SERVICE_CATALOG_TASKS/service_catalog_tasks.json", "w"
+    ) as f:
         json.dump(full_data, f, indent=4)
 
 
