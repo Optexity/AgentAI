@@ -54,8 +54,8 @@ def main(input_dir: str):
         task_path = os.path.join(input_dir, task_type)
         if not os.path.isdir(task_path):
             continue
-        # if task_type != "SERVICE_CATALOG_TASKS":
-        #     continue
+        if task_type != "SERVICE_CATALOG_TASKS":
+            continue
         for task_sub_type in os.listdir(task_path):
             task_sub_path = os.path.join(task_path, task_sub_type)
             if not os.path.isdir(task_sub_path):
@@ -64,7 +64,12 @@ def main(input_dir: str):
                 seed_path = os.path.join(task_sub_path, seed)
                 if not os.path.isdir(seed_path):
                     continue
-                for step in os.listdir(seed_path):
+                agent = BasicAgent("basic_agent", env, "basic_agent")
+                goal = read_file(os.path.join(seed_path, "goal.txt"))
+                all_steps = [a for a in os.listdir(seed_path) if a.startswith("step-")]
+                for step in sorted(
+                    all_steps, key=lambda x: int(x.removeprefix("step-"))
+                ):
                     step_path = os.path.join(seed_path, step)
                     if not os.path.isdir(step_path):
                         continue
@@ -73,13 +78,30 @@ def main(input_dir: str):
                             os.path.join(step_path, "action.txt")
                         )
                         action = agent.parse_model_response(action_response)
-                    except Exception as e:
-                        # print(os.path.join(step_path, "action.txt"))
-                        print(action_response)
-                        # print(f"Error in {step_path}: {e}")
-                        # import pdb
+                        axtree = read_file(os.path.join(step_path, "axtree.txt"))
+                        obs = {
+                            ObsProcessorTypes.axtree: axtree,
+                            ObsProcessorTypes.goal: goal,
+                            ObsProcessorTypes.last_action_error: None,
+                        }
+                        messages = agent.get_input_messages(obs)
+                        target = (
+                            f"```json\n{action_response.model_dump_json(indent=4)}\n```"
+                        )
 
-                        # pdb.set_trace()
+                        agent.response_history.append(action_response)
+                        import pdb
+
+                        pdb.set_trace()
+                    except Exception as e:
+
+                        # print(os.path.join(step_path, "action.txt"))
+                        # print(action_response)
+                        print(f"Error in {step_path}: {e}")
+                        import pdb
+
+                        pdb.set_trace()
+                        pass
 
 
 if __name__ == "__main__":

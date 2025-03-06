@@ -23,7 +23,7 @@ and with which only you can interact via specific commands.
 
 Review the instructions from the user, the current state of the page and all other information
 to find the best possible next action to accomplish your goal. Your answer will be interpreted
-and executed by a program, make sure to follow the formatting instructions."""
+and executed by a program, make sure to follow the formatting instructions. Try not repeating same actions on same page as that would not be helpful to the user."""
 
 format_instruction = """Only output the json object. Do not output anything other than the json object which should be directly parsable by pydantic. Output the json object in the following format:
 ```json

@@ -36,7 +36,17 @@ def get_example_response_prompt() -> str:
     separator = style[PromptKeys.EXAMPLE_RESPONSE][PromptStyle.LIST_SEPARATOR]
     prompt = ""
     for i, response in enumerate(system_prompt[PromptKeys.EXAMPLE_RESPONSE]):
-        prompt += f"{separator} {i}\n{json.dumps(response,indent=4)}\n"
+        prompt += f"{separator} {i}\n```json\n{json.dumps(response,indent=4)}\n```\n"
+    return prompt
+
+
+def get_previous_response_prompt(response_history: list[Response]) -> str:
+    separator = style[PromptKeys.PREVIOUS_RESPONSES][PromptStyle.LIST_SEPARATOR]
+    prompt = ""
+    for i, response in enumerate(response_history):
+        prompt += (
+            f"{separator} {i}\n```json\n{response.model_dump_json(indent=4)}\n```\n"
+        )
     return prompt
 
 
@@ -65,19 +75,26 @@ def get_system_prompt(keys: list[PromptKeys], action_space: list[ActionTypes]) -
     return prompt
 
 
-def get_user_prompt(obs: dict, keys: list[PromptKeys]) -> str:
+def get_user_prompt(
+    obs: dict, response_history: list[Response], keys: list[PromptKeys]
+) -> str:
     prompt = ""
     if PromptKeys.GOAL in keys:
         st = style[PromptKeys.GOAL]
-        prompt += f"{st[PromptStyle.BEGIN]}\n{obs['chat_messages'][-1]['message']}\n{st[PromptStyle.END]}\n\n"
+        prompt += f"{st[PromptStyle.BEGIN]}\n{obs[ObsProcessorTypes.goal]}\n{st[PromptStyle.END]}\n\n"
 
     if PromptKeys.CURRENT_OBSERVATION in keys:
         st = style[PromptKeys.CURRENT_OBSERVATION]
         prompt += f"{st[PromptStyle.BEGIN]}\n{st[PromptStyle.DESCRIPTION]}\n{obs[ObsProcessorTypes.axtree]}\n{st[PromptStyle.END]}\n\n"
 
-    if PromptKeys.PREVIOUS_ACTION_ERROR in keys and obs["last_action_error"]:
+    if PromptKeys.PREVIOUS_RESPONSES in keys:
+        st = style[PromptKeys.PREVIOUS_RESPONSES]
+        prompt += f"{st[PromptStyle.BEGIN]}\n{get_previous_response_prompt(response_history)}\n{st[PromptStyle.END]}\n\n"
+
+    last_action_error = obs[ObsProcessorTypes.last_action_error]
+    if PromptKeys.PREVIOUS_ACTION_ERROR in keys and last_action_error:
         st = style[PromptKeys.PREVIOUS_ACTION_ERROR]
-        prompt += f"""{st[PromptStyle.BEGIN]}\n{obs["last_action_error"]}\n{st[PromptStyle.END]}\n\n"""
+        prompt += f"""{st[PromptStyle.BEGIN]}\n{last_action_error}\n{st[PromptStyle.END]}\n\n"""
 
     if PromptKeys.NEXT_STEP in keys:
         st = style[PromptKeys.NEXT_STEP]
@@ -128,10 +145,14 @@ class BasicAgent:
             PromptKeys.CURRENT_OBSERVATION,
             PromptKeys.PREVIOUS_ACTION_ERROR,
             PromptKeys.NEXT_STEP,
+            PromptKeys.PREVIOUS_RESPONSES,
         ]
         messages = [
             {"role": Roles.SYSTEM, "content": self.system_prompt},
-            {"role": Roles.USER, "content": get_user_prompt(obs, keys)},
+            {
+                "role": Roles.USER,
+                "content": get_user_prompt(obs, self.response_history, keys),
+            },
         ]
         return messages
 

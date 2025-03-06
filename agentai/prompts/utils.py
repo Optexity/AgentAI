@@ -1,3 +1,5 @@
+from enum import Enum, auto, unique
+
 from pydantic import BaseModel, Field
 
 
@@ -8,18 +10,19 @@ class Roles:
     TOOL = "tool"
 
 
-class PromptKeys:
-    INSTRUCTION = "instruction"
-    RESPONSE_JSON_DESCRIPTION = "output_description"
-    FORMAT_INSTRUCTION = "format_instruction"
-    EXAMPLE_RESPONSE = "example_response"
-    TRAJECTORIES = "trajectories"
-    AVAILABLE_ACTIONS = "available_actions"
-    PREVIOUS_ACTION_ERROR = "previous_action_error"
-    PREVIOUS_ACTION = "previous_action"
-    CURRENT_OBSERVATION = "current_observation"
-    NEXT_STEP = "next_step"
-    GOAL = "goal"
+@unique
+class PromptKeys(Enum):
+    INSTRUCTION = auto()
+    RESPONSE_JSON_DESCRIPTION = auto()
+    FORMAT_INSTRUCTION = auto()
+    EXAMPLE_RESPONSE = auto()
+    TRAJECTORIES = auto()
+    AVAILABLE_ACTIONS = auto()
+    PREVIOUS_ACTION_ERROR = auto()
+    PREVIOUS_RESPONSES = auto()
+    CURRENT_OBSERVATION = auto()
+    NEXT_STEP = auto()
+    GOAL = auto()
 
 
 class PromptStyle:
@@ -84,9 +87,10 @@ style = {
         PromptStyle.BEGIN: "[PREVIOUS_ACTION_ERROR]",
         PromptStyle.END: "[/PREVIOUS_ACTION_ERROR]",
     },
-    "previous_action": {
-        PromptStyle.BEGIN: "[PREVIOUS_ACTION]",
-        PromptStyle.END: "[/PREVIOUS_ACTION]",
+    PromptKeys.PREVIOUS_RESPONSES: {
+        PromptStyle.BEGIN: "[PREVIOUS_RESPONSES]",
+        PromptStyle.END: "[/PREVIOUS_RESPONSES]",
+        PromptStyle.LIST_SEPARATOR: "Previous Response",
     },
     PromptKeys.CURRENT_OBSERVATION: {
         PromptStyle.BEGIN: "[CURRENT_OBSERVATION]",
