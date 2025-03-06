@@ -34,10 +34,10 @@ class Response(BaseModel):
     The response format for the action to take. Think step-by-step through the action you want to take.
     """
 
-    observation: str = Field(
-        description="Summary of the observation you are responding to. This is the current state of the page."
-    )
-    reasoning: str = Field(description="Your reasoning for taking this action.")
+    # observation: str = Field(
+    #     description="Summary of the observation you are responding to. This is the current state of the page."
+    # )
+    # reasoning: str = Field(description="Your reasoning for taking this action.")
     action_name: str = Field(
         description="The action_name should be one of the available actions"
     )
