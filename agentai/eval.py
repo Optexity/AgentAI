@@ -5,6 +5,8 @@ import os
 def main(path: str):
     total = 0
     correct = 0
+    incorrect = 0
+    unfinished = 0
     for task in sorted(os.listdir(path)):
         task_path = os.path.join(path, task)
         for seed in sorted(os.listdir(task_path)):
@@ -15,14 +17,19 @@ def main(path: str):
                         with open(os.path.join(seed_path, file), "r") as f:
                             content = f.read()
                         total += 1
+                        if "Final Reward: 0" in content:
+                            incorrect += 0
                         if "Final Reward: 1" in content:
                             correct += 1
                         else:
                             print(f"Incorrect: {task} {seed}")
+                            unfinished += 1
 
     print(f"Total: {total}")
-    print(f"Correct: {correct}")
-    print(f"Accuracy: {correct / total:.2%}")
+    print(f"Unfinished: {unfinished}, percentage: {unfinished / total:.2%}")
+    print(
+        f"Correct: {correct}, percentage: {correct / total:.2%}, percentage of finished: {correct / (correct+incorrect):.2%}"
+    )
 
 
 if __name__ == "__main__":
