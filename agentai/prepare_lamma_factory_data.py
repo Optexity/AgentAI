@@ -52,14 +52,22 @@ def main(input_dir: str):
             continue
         if task_type != "SERVICE_CATALOG_TASKS2":
             continue
-        for task_sub_type in os.listdir(task_path):
+        done_sub_tasks = 0
+        for task_sub_type in sorted(os.listdir(task_path)):
+            if done_sub_tasks >= 4:
+                break
             task_sub_path = os.path.join(task_path, task_sub_type)
             if not os.path.isdir(task_sub_path):
                 continue
+            done_sub_tasks += 1
+            done_seeds = 0
             for seed in os.listdir(task_sub_path):
+                if done_seeds >= 4:
+                    break
                 seed_path = os.path.join(task_sub_path, seed)
                 if not os.path.isdir(seed_path):
                     continue
+                done_seeds += 1
                 agent = BasicAgent("basic_agent", env, "basic_agent", port=5000)
                 goal = read_file(os.path.join(seed_path, "goal.txt"))
                 all_steps = [a for a in os.listdir(seed_path) if a.startswith("step-")]
@@ -112,7 +120,8 @@ def main(input_dir: str):
 
     os.makedirs("./train_data/SERVICE_CATALOG_TASKS", exist_ok=True)
     with open(
-        "./train_data/SERVICE_CATALOG_TASKS/service_catalog_tasks.json", "w"
+        "./train_data/SERVICE_CATALOG_TASKS/service_catalog_tasks_4_sub_tasks_4_seeds.json",
+        "w",
     ) as f:
         json.dump(full_data, f, indent=4)
 
