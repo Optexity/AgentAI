@@ -44,13 +44,13 @@ def main(input_dir: str):
         [ObsProcessorTypes.axtree],
         headless=True,
     )
-    agent = BasicAgent("basic_agent", env, "basic_agent")
+
     full_data = []
     for task_type in os.listdir(input_dir):
         task_path = os.path.join(input_dir, task_type)
         if not os.path.isdir(task_path):
             continue
-        if task_type != "SERVICE_CATALOG_TASKS":
+        if task_type != "SERVICE_CATALOG_TASKS2":
             continue
         for task_sub_type in os.listdir(task_path):
             task_sub_path = os.path.join(task_path, task_sub_type)
@@ -60,7 +60,7 @@ def main(input_dir: str):
                 seed_path = os.path.join(task_sub_path, seed)
                 if not os.path.isdir(seed_path):
                     continue
-                agent = BasicAgent("basic_agent", env, "basic_agent")
+                agent = BasicAgent("basic_agent", env, "basic_agent", port=5000)
                 goal = read_file(os.path.join(seed_path, "goal.txt"))
                 all_steps = [a for a in os.listdir(seed_path) if a.startswith("step-")]
                 for step in sorted(
@@ -73,6 +73,11 @@ def main(input_dir: str):
                         action_response = read_action(
                             os.path.join(step_path, "action.txt")
                         )
+                        if action_response.action_name == "send_task_complete":
+                            action_response.action_name = "task_complete"
+                            action_response.action_params = {
+                                "msg": action_response.action_params["text"]
+                            }
                         action = agent.parse_model_response(action_response)
                         axtree = read_file(os.path.join(step_path, "axtree.txt"))
                         obs = {
@@ -113,9 +118,7 @@ def main(input_dir: str):
 
 
 if __name__ == "__main__":
-    main(
-        "/Users/sankalp/repository/github/Reinforce-Align-AI/trajectorybucket/trace_profiling"
-    )
+    main("/Users/sankalp/repository/github/AWS_DATA/trajectorybucket/trace_profiling")
     exit()
     parser = argparse.ArgumentParser(description="Prepare Lamma Factory Data")
     parser.add_argument("--input", type=str, help="Input file path")
