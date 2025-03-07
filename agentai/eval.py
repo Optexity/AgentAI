@@ -18,8 +18,8 @@ def main(path: str):
                             content = f.read()
                         total += 1
                         if "Final Reward: 0" in content:
-                            incorrect += 0
-                        if "Final Reward: 1" in content:
+                            incorrect += 1
+                        elif "Final Reward: 1" in content:
                             correct += 1
                         else:
                             print(f"Incorrect: {task} {seed}")

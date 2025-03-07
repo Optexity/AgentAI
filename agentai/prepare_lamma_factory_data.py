@@ -2,11 +2,8 @@ import argparse
 import ast
 import json
 import os
-import re
 
 from agent import BasicAgent
-from browsergym.workarena import SERVICE_CATALOG_TASKS
-from browsergym.workarena.tasks.base import AbstractServiceNowTask
 from computergym import (
     BrowserEnvTypes,
     EnvTypes,
@@ -14,9 +11,7 @@ from computergym import (
     OpenEndedWebsite,
     make_env,
 )
-from computergym.utils import save_str_obs
 from prompts.utils import Response
-from utils import get_logger
 
 
 def read_file(file_path):
