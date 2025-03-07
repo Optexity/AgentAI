@@ -8,21 +8,32 @@
 #SBATCH --mem=40G
 #SBATCH --time=00:10:00
 #SBATCH --priority=1
-#SBATCH --array=0-1
+#SBATCH --array=0-0
 
 cd /data/user_data/sachingo/Reinforce-Align-AI
 source ~/.bashrc
 conda activate browsergym
 
 export PORT=800$SLURM_ARRAY_TASK_ID
-API_PORT=$PORT llamafactory-cli api AgentAI/agentai/inference_configs/llama3.1_lora_sft_service_catalog.yaml &
+
+cd LLaMA-Factory
+echo "Starting LLaMA API server on port $PORT"
+API_PORT=$PORT llamafactory-cli api ../AgentAI/agentai/inference_configs/llama3.1_lora_sft_service_catalog.yaml &
 SERVER_PID=$!
+echo "Server PID: $SERVER_PID"
 
 sleep 2m
 
-cd AgentAI/agentai
+export SNOW_INSTANCE_URL="https://dev283325.service-now.com/"
+export SNOW_INSTANCE_UNAME="admin"
+export SNOW_INSTANCE_PWD="wx%h/z5WWW0J"
+
+cd ../AgentAI/agentai
 for seed in {0..9}; do
+    echo "Starting inference for seed $seed"
     python main.py --seed $seed --task_num $SLURM_ARRAY_TASK_ID --port $PORT --headless
 done
 
+echo "Killing server"
 kill -9 $SERVER_PID
+echo "Done"
