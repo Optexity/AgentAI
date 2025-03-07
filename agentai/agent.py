@@ -104,7 +104,9 @@ def get_user_prompt(
 
 
 class BasicAgent:
-    def __init__(self, name: str, env: OpenEndedWebsite, agent_description: str):
+    def __init__(
+        self, name: str, env: OpenEndedWebsite, agent_description: str, port: int = None
+    ):
         self.name = name
         self.agent_description = agent_description
         self.action_space = env.get_action_space()
@@ -127,17 +129,8 @@ class BasicAgent:
             VLLMModels.LLAMA_3_1_8B_INSTRUCT,
             LLMModelType.LLAMA_FACTORY_VLLM,
             use_instructor=False,
+            port=port,
         )
-
-    def get_history_messages(self) -> list[dict]:
-        return
-        messages = []
-        for i, response in enumerate(self.response_history):
-            messages.append({"role": "user", "content": next_action})
-            messages.append(
-                {"role": "assistant", "content": response.model_dump_json(indent=4)}
-            )
-        return messages
 
     def get_input_messages(self, obs: dict) -> list[dict]:
         keys = [

@@ -1,7 +1,9 @@
 from .llm_model import GeminiModels, LLMModelType, VLLMModels
 
 
-def get_llm_model(model_name: str, model_type: LLMModelType, use_instructor: bool):
+def get_llm_model(
+    model_name: str, model_type: LLMModelType, use_instructor: bool, port: int = None
+):
     if model_type == LLMModelType.GEMINI:
         from .gemini import Gemini
 
@@ -9,6 +11,6 @@ def get_llm_model(model_name: str, model_type: LLMModelType, use_instructor: boo
     elif model_type == LLMModelType.LLAMA_FACTORY_VLLM:
         from .lamma_factory_vllm import LlamaFactoryVllm
 
-        return LlamaFactoryVllm(model_name, use_instructor)
+        return LlamaFactoryVllm(model_name, use_instructor, port)
     else:
         raise ValueError(f"Invalid model type: {model_type}")

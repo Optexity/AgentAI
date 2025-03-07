@@ -14,5 +14,15 @@ cd /data/user_data/sachingo/Reinforce-Align-AI
 source ~/.bashrc
 conda activate browsergym
 
-cd LLaMA-Factory
-API_PORT=800$SLURM_ARRAY_TASK_ID llamafactory-cli api AgentAI/agentai/inference_configs/llama3.1_lora_sft_service_catalog.yaml
+export PORT=800$SLURM_ARRAY_TASK_ID
+API_PORT=$PORT llamafactory-cli api AgentAI/agentai/inference_configs/llama3.1_lora_sft_service_catalog.yaml &
+SERVER_PID=$!
+
+sleep 2m
+
+cd AgentAI/agentai
+for seed in {0..9}; do
+    python main.py --seed $seed --task_num $SLURM_ARRAY_TASK_ID --port $PORT --headless
+done
+
+kill -9 $SERVER_PID
