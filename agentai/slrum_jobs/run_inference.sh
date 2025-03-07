@@ -13,8 +13,9 @@
 
 cd /data/user_data/sachingo/Reinforce-Align-AI
 source ~/.bashrc
-conda init
 conda activate browsergym
+
+conda env list
 
 python --version
 echo "Running array task ID: $SLURM_ARRAY_TASK_ID"
