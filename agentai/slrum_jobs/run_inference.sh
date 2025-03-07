@@ -14,7 +14,7 @@ cd /data/user_data/sachingo/Reinforce-Align-AI
 source ~/.bashrc
 conda activate browsergym
 
-export PORT=800$SLURM_ARRAY_TASK_ID
+export PORT=673$SLURM_ARRAY_TASK_ID
 
 cd LLaMA-Factory
 echo "Starting LLaMA API server on port $PORT"
