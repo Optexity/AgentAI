@@ -6,9 +6,9 @@
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:A6000:1
 #SBATCH --mem=40G
-#SBATCH --time=00:10:00
+#SBATCH --time=3:00:00
 #SBATCH --priority=1
-#SBATCH --array=0-0
+#SBATCH --array=0-8
 
 cd /data/user_data/sachingo/Reinforce-Align-AI
 source ~/.bashrc
@@ -31,7 +31,7 @@ export SNOW_INSTANCE_PWD="wx%h/z5WWW0J"
 cd ../AgentAI/agentai
 for seed in {0..9}; do
     echo "Starting inference for seed $seed"
-    python main.py --seed $seed --task_num $SLURM_ARRAY_TASK_ID --port $PORT --headless
+    python main.py --seed $seed --task_num $SLURM_ARRAY_TASK_ID --port $PORT --headless --log_path ./logs
 done
 
 echo "Killing server"
