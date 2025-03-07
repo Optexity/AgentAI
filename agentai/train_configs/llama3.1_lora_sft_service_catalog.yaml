@@ -20,7 +20,7 @@ preprocessing_num_workers: 16
 ### output
 output_dir: saves/llama3.1-8b/lora/sft/service_catalog_tasks
 logging_steps: 10
-save_steps: 500
+save_steps: 74
 plot_loss: true
 overwrite_output_dir: true
 
