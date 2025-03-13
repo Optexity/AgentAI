@@ -42,6 +42,7 @@ def run(
         cache_dir=log_path,
         goal_message=goal,
         headless=headless,
+        proxy="http://38.154.227.167:5868",
     )
     agent = BasicAgent("basic_agent", env, "basic_agent", port)
 
