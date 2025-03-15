@@ -5,13 +5,7 @@ import os
 from agent import BasicAgent
 from browsergym.workarena import SERVICE_CATALOG_TASKS
 from browsergym.workarena.tasks.base import AbstractServiceNowTask
-from computergym import (
-    BrowserEnvTypes,
-    EnvTypes,
-    ObsProcessorTypes,
-    OpenEndedWebsite,
-    make_env,
-)
+from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
 from computergym.utils import save_str_obs
 from utils import get_logger
 
@@ -26,23 +20,18 @@ def run(
 
     logger = get_logger(__name__, log_path=log_path, log_to_console=log_to_console)
 
-    goal, _ = task.setup_goal(None)
-    logger.info(f"Goal: {goal}")
+    # goal, _ = task.setup_goal(None)
+    # logger.info(f"Goal: {goal}")
+    goal = "signin to the website using sankalp@292 and flskdng"
 
     env: OpenEndedWebsite = make_env(
-        task.start_url,
+        "https://lawyersaathi.com",
         EnvTypes.browser,
-        BrowserEnvTypes.workarena,
-        [
-            ObsProcessorTypes.html,
-            ObsProcessorTypes.axtree,
-            ObsProcessorTypes.screenshot,
-            ObsProcessorTypes.som,
-        ],
+        BrowserEnvTypes.openended,
         cache_dir=log_path,
         goal_message=goal,
         headless=headless,
-        proxy="http://38.154.227.167:5868",
+        # proxy="http://38.154.227.167:5868",
     )
     agent = BasicAgent("basic_agent", env, "basic_agent", port)
 
@@ -85,13 +74,13 @@ def run(
 
 
 def main(args):
-    task_entrypoint = SERVICE_CATALOG_TASKS[args.task_num]
-    task = task_entrypoint(seed=args.seed)
-    log_path = os.path.join(
-        args.log_path, task_entrypoint.__name__, f"seed-{str(args.seed)}"
-    )
-    os.makedirs(log_path, exist_ok=True)
-    reward = run(task, log_path, args.log_to_console, args.headless, args.port)
+    # task_entrypoint = SERVICE_CATALOG_TASKS[args.task_num]
+    # task = task_entrypoint(seed=args.seed)
+    # log_path = os.path.join(
+    #     args.log_path, task_entrypoint.__name__, f"seed-{str(args.seed)}"
+    # )
+    # os.makedirs(log_path, exist_ok=True)
+    reward = run(None, None, args.log_to_console, args.headless, args.port)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import logging
 
 from computergym import (
     ActionTypes,
-    ObsProcessorTypes,
+    Observation,
     OpenEndedWebsite,
     get_action_object,
     get_action_signature,
@@ -76,25 +76,24 @@ def get_system_prompt(keys: list[PromptKeys], action_space: list[ActionTypes]) -
 
 
 def get_user_prompt(
-    obs: dict, response_history: list[Response], keys: list[PromptKeys]
+    obs: Observation, response_history: list[Response], keys: list[PromptKeys]
 ) -> str:
     prompt = ""
     if PromptKeys.GOAL in keys:
         st = style[PromptKeys.GOAL]
-        prompt += f"{st[PromptStyle.BEGIN]}\n{obs[ObsProcessorTypes.goal]}\n{st[PromptStyle.END]}\n\n"
+        prompt += f"{st[PromptStyle.BEGIN]}\n{obs.goal}\n{st[PromptStyle.END]}\n\n"
 
     if PromptKeys.CURRENT_OBSERVATION in keys:
         st = style[PromptKeys.CURRENT_OBSERVATION]
-        prompt += f"{st[PromptStyle.BEGIN]}\n{st[PromptStyle.DESCRIPTION]}\n{obs[ObsProcessorTypes.axtree]}\n{st[PromptStyle.END]}\n\n"
+        prompt += f"{st[PromptStyle.BEGIN]}\n{st[PromptStyle.DESCRIPTION]}\n{obs.axtree}\n{st[PromptStyle.END]}\n\n"
 
     if PromptKeys.PREVIOUS_RESPONSES in keys:
         st = style[PromptKeys.PREVIOUS_RESPONSES]
         prompt += f"{st[PromptStyle.BEGIN]}\n{get_previous_response_prompt(response_history)}\n{st[PromptStyle.END]}\n\n"
 
-    last_action_error = obs[ObsProcessorTypes.last_action_error]
-    if PromptKeys.PREVIOUS_ACTION_ERROR in keys and last_action_error:
+    if PromptKeys.PREVIOUS_ACTION_ERROR in keys and obs.last_action_error:
         st = style[PromptKeys.PREVIOUS_ACTION_ERROR]
-        prompt += f"""{st[PromptStyle.BEGIN]}\n{last_action_error}\n{st[PromptStyle.END]}\n\n"""
+        prompt += f"""{st[PromptStyle.BEGIN]}\n{obs.last_action_error}\n{st[PromptStyle.END]}\n\n"""
 
     if PromptKeys.NEXT_STEP in keys:
         st = style[PromptKeys.NEXT_STEP]
@@ -122,17 +121,17 @@ class BasicAgent:
         )
         self.response_history: list[Response] = []
 
-        # self.model = get_llm_model(
-        #     GeminiModels.GEMINI_2_0_FLASH, LLMModelType.GEMINI, use_instructor=False
-        # )
         self.model = get_llm_model(
-            VLLMModels.LLAMA_3_1_8B_INSTRUCT,
-            LLMModelType.LLAMA_FACTORY_VLLM,
-            use_instructor=False,
-            port=port,
+            GeminiModels.GEMINI_2_0_FLASH, LLMModelType.GEMINI, use_instructor=False
         )
+        # self.model = get_llm_model(
+        #     VLLMModels.LLAMA_3_1_8B_INSTRUCT,
+        #     LLMModelType.LLAMA_FACTORY_VLLM,
+        #     use_instructor=False,
+        #     port=port,
+        # )
 
-    def get_input_messages(self, obs: dict) -> list[dict]:
+    def get_input_messages(self, obs: Observation) -> list[dict]:
         keys = [
             PromptKeys.GOAL,
             PromptKeys.CURRENT_OBSERVATION,
@@ -157,7 +156,7 @@ class BasicAgent:
         action = action_object.model_validate(action_params)
         return action
 
-    def get_next_action(self, obs: str) -> tuple[Response, BaseModel]:
+    def get_next_action(self, obs: Observation) -> tuple[Response, BaseModel]:
         input_messages = self.get_input_messages(obs)
         model_response = self.model.get_model_response(input_messages)
         self.response_history.append(model_response)

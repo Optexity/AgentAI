@@ -65,7 +65,5 @@ class LLMModel:
                     return response
                 except Exception as e:
                     continue
-        import pdb
 
-        pdb.set_trace()
         raise ValueError("Could not parse response from completion.")

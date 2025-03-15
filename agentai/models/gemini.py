@@ -37,8 +37,6 @@ class Gemini(LLMModel):
                 response = self.get_response_from_completion(content)
 
             except Exception as e:
-                import pdb
-
-                pdb.set_trace()
+                print("Super exception:", e)
 
         return response
