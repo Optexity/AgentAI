@@ -1,32 +1,23 @@
 import ast
 import re
-from enum import Enum
+from enum import Enum, unique
 
 from prompts.utils import Response
 
 
-class LLMModelType(Enum):
-    OPENAI = "openai"
-    MISTRAL = "mistral"
-    COHERE = "cohere"
-    GEMINI = "gemini"
-    AZURE = "azure"
-    CUSTOM = "custom"
-    LiteLLM = "LiteLLM"
-    LLAMA_FACTORY_VLLM = "llama_factory_vllm"
-
-
-class GeminiModels:
+@unique
+class GeminiModels(Enum):
     GEMINI_2_0_FLASH = "gemini-2.0-flash"
 
 
-class VLLMModels:
+@unique
+class VLLMModels(Enum):
     LLAMA_3_1_8B_INSTRUCT = "meta-llama/Meta-Llama-3.1-8B-Instruct"
 
 
 class LLMModel:
-    def __init__(self, model_name: str, model_type: LLMModelType, use_instructor: bool):
-        self.model_type = model_type
+    def __init__(self, model_name: GeminiModels | VLLMModels, use_instructor: bool):
+
         self.model_name = model_name
         self.use_instructor = use_instructor
 

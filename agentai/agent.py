@@ -9,7 +9,7 @@ from computergym import (
     get_action_signature,
 )
 from computergym.actions.action import ActionTypes
-from models import GeminiModels, LLMModelType, VLLMModels, get_llm_model
+from models import GeminiModels, VLLMModels, get_llm_model
 from prompts.prompts import system_prompt, user_prompt
 from prompts.utils import PromptKeys, PromptStyle, Response, Roles, style
 from pydantic import BaseModel
@@ -104,10 +104,14 @@ def get_user_prompt(
 
 class BasicAgent:
     def __init__(
-        self, name: str, env: OpenEndedWebsite, agent_description: str, port: int = None
+        self,
+        model_name: GeminiModels | VLLMModels,
+        env: OpenEndedWebsite,
+        use_instructor: bool = False,
+        port: int = None,
     ):
-        self.name = name
-        self.agent_description = agent_description
+        self.model_name = model_name
+        self.use_instructor = use_instructor
         self.action_space = env.get_action_space()
         self.system_prompt = get_system_prompt(
             [
@@ -121,15 +125,7 @@ class BasicAgent:
         )
         self.response_history: list[Response] = []
 
-        self.model = get_llm_model(
-            GeminiModels.GEMINI_2_0_FLASH, LLMModelType.GEMINI, use_instructor=False
-        )
-        # self.model = get_llm_model(
-        #     VLLMModels.LLAMA_3_1_8B_INSTRUCT,
-        #     LLMModelType.LLAMA_FACTORY_VLLM,
-        #     use_instructor=False,
-        #     port=port,
-        # )
+        self.model = get_llm_model(model_name, use_instructor=use_instructor, port=port)
 
     def get_input_messages(self, obs: Observation) -> list[dict]:
         keys = [
