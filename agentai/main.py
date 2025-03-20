@@ -2,12 +2,11 @@ import argparse
 import json
 import os
 
+from agent import BasicAgent
 from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
 from computergym.utils import save_str_to_file
-
-from .agent import BasicAgent
-from .models import GeminiModels, VLLMModels
-from .utils import get_logger
+from models import GeminiModels, VLLMModels
+from utils import get_logger
 
 
 def run(

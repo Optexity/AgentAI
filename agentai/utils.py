@@ -3,9 +3,8 @@ import os
 import sys
 
 from computergym.actions.action import string_to_action_type
+from prompts import Response
 from pydantic import BaseModel
-
-from .prompts import Response
 
 
 def get_logger(

@@ -1,11 +1,10 @@
 import logging
 
 from computergym import Observation, OpenEndedWebsite
+from models import GeminiModels, VLLMModels, get_llm_model
+from prompts import PromptKeys, Response, Roles, get_system_prompt, get_user_prompt
 from pydantic import BaseModel
-
-from .models import GeminiModels, VLLMModels, get_llm_model
-from .prompts import PromptKeys, Response, Roles, get_system_prompt, get_user_prompt
-from .utils import response_to_action
+from utils import response_to_action
 
 logger = logging.getLogger(__name__)
 
