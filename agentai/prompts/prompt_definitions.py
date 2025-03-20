@@ -1,21 +1,21 @@
 import json
 
-from computergym.actions.action import ActionTypes, action_examples
+from computergym.actions.action import ClickAction, InputText, action_examples
 
 from .utils import Response
 
 click_example_response = Response(
     observation="The current page looks like a homepage with signin button relevant for this task.",
     reasoning="I need to click on the Submit button to send the form. I will use the click action on the button, which has bid 12.",
-    action_name=ActionTypes.click.value,
-    action_params=action_examples[ActionTypes.click].model_dump(),
+    action_name=ClickAction.__name__,
+    action_params=action_examples[ClickAction.__name__].model_dump(),
 )
 
 input_text_example_response = Response(
     observation="The current page looks signinpage with email and password fields relevant for this task.",
     reasoning="I need to enter text in text field with bid 12. I will use the input_text action.",
-    action_name=ActionTypes.input_text.value,
-    action_params=action_examples[ActionTypes.input_text].model_dump(),
+    action_name=InputText.__name__,
+    action_params=action_examples[InputText.__name__].model_dump(),
 )
 
 instruction_prompt = """You are a UI Assistant, your goal is to help the user perform tasks using a web browser. You can

@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-from computergym import ActionTypes, get_action_object
+from computergym.actions.action import string_to_action_type
 from pydantic import BaseModel
 
 from .prompts import Response
@@ -73,9 +73,7 @@ def action_to_response(action: BaseModel):
 
 
 def response_to_action(response: Response) -> BaseModel:
-    action_name = response.action_name
     action_params = response.action_params
-    action_type = ActionTypes[action_name]
-    action_object = get_action_object(action_type)
+    action_object = string_to_action_type(response.action_name)
     action = action_object.model_validate(action_params)
     return action

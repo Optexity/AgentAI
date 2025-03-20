@@ -1,8 +1,7 @@
 import json
 import logging
 
-from computergym import ActionTypes, Observation, OpenEndedWebsite, get_action_signature
-from computergym.actions.action import ActionTypes
+from computergym import Observation, OpenEndedWebsite, custom_json_schema
 from pydantic import BaseModel
 
 from .models import GeminiModels, VLLMModels, get_llm_model
@@ -13,18 +12,13 @@ from .utils import response_to_action
 logger = logging.getLogger(__name__)
 
 
-def get_action_prompt(action_type: ActionTypes) -> dict:
-    name = action_type.value
-    description = get_action_signature(action_type)
-    description["action_name"] = name
-    return description
-
-
-def get_action_space_prompt(action_space: list[ActionTypes]) -> str:
+def get_action_space_prompt(action_space: list[BaseModel]) -> str:
     separator = style[PromptKeys.AVAILABLE_ACTIONS][PromptStyle.LIST_SEPARATOR]
     prompt = ""
     for i, action in enumerate(action_space):
-        prompt += f"{separator} {i}\n{json.dumps(get_action_prompt(action),indent=4)}\n"
+        prompt += (
+            f"{separator} {i}\n{json.dumps(custom_json_schema(action),indent=4)}\n"
+        )
     return prompt
 
 
@@ -46,7 +40,7 @@ def get_previous_response_prompt(response_history: list[Response]) -> str:
     return prompt
 
 
-def get_system_prompt(keys: list[PromptKeys], action_space: list[ActionTypes]) -> str:
+def get_system_prompt(keys: list[PromptKeys], action_space: list[BaseModel]) -> str:
     prompt = ""
     if PromptKeys.INSTRUCTION in keys:
         st = style[PromptKeys.INSTRUCTION]
