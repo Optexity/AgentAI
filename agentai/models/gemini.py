@@ -3,7 +3,7 @@ import os
 import google.generativeai as genai
 import instructor
 import litellm
-from agentai.prompts.utils import Response
+from agentai.prompts import Response
 
 from .llm_model import GeminiModels, LLMModel
 

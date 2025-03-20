@@ -1,6 +1,6 @@
 import json
 
-from computergym.actions.action import ClickAction, InputText, action_examples
+from computergym.actions import ClickAction, InputText, action_examples
 
 from .utils import Response
 
