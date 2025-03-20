@@ -2,6 +2,11 @@ import logging
 import os
 import sys
 
+from computergym import ActionTypes, get_action_object
+from pydantic import BaseModel
+
+from .prompts import Response
+
 
 def get_logger(
     name: str,
@@ -58,3 +63,19 @@ def get_logger(
         pass
 
     return logger
+
+
+def action_to_response(action: BaseModel):
+    ## TODO: correct class name
+    return Response(
+        action_name=action.__class__.__name__, action_params=action.model_dump()
+    )
+
+
+def response_to_action(response: Response) -> BaseModel:
+    action_name = response.action_name
+    action_params = response.action_params
+    action_type = ActionTypes[action_name]
+    action_object = get_action_object(action_type)
+    action = action_object.model_validate(action_params)
+    return action

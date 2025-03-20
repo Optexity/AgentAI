@@ -6,7 +6,7 @@ from agent import BasicAgent
 from browsergym.workarena import SERVICE_CATALOG_TASKS
 from browsergym.workarena.tasks.base import AbstractServiceNowTask
 from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
-from computergym.utils import save_str_obs
+from computergym.utils import save_str_to_file
 from utils import get_logger
 
 
@@ -50,7 +50,9 @@ def run(
             os.makedirs(cache_dir, exist_ok=True)
             string = model_response.model_dump()
             string = json.dumps(string, indent=4)
-            save_str_obs(string, cache_dir, f"model-response-{env.current_step}.txt")
+            save_str_to_file(
+                string, cache_dir, f"model-response-{env.current_step}.txt"
+            )
 
         logger.info(f"model_response: {model_response}")
         string = action.model_dump()

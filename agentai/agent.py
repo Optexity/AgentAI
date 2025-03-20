@@ -1,18 +1,14 @@
 import json
 import logging
 
-from computergym import (
-    ActionTypes,
-    Observation,
-    OpenEndedWebsite,
-    get_action_object,
-    get_action_signature,
-)
+from computergym import ActionTypes, Observation, OpenEndedWebsite, get_action_signature
 from computergym.actions.action import ActionTypes
 from models import GeminiModels, VLLMModels, get_llm_model
 from prompts.prompts import system_prompt, user_prompt
 from prompts.utils import PromptKeys, PromptStyle, Response, Roles, style
 from pydantic import BaseModel
+
+from .utils import response_to_action
 
 logger = logging.getLogger(__name__)
 
@@ -144,17 +140,9 @@ class BasicAgent:
         ]
         return messages
 
-    def parse_model_response(self, model_response: Response) -> BaseModel:
-        action_name = model_response.action_name
-        action_params = model_response.action_params
-        action_type = ActionTypes[action_name]
-        action_object = get_action_object(action_type)
-        action = action_object.model_validate(action_params)
-        return action
-
     def get_next_action(self, obs: Observation) -> tuple[Response, BaseModel]:
         input_messages = self.get_input_messages(obs)
         model_response = self.model.get_model_response(input_messages)
         self.response_history.append(model_response)
-        action = self.parse_model_response(model_response)
+        action = response_to_action(model_response)
         return model_response, action

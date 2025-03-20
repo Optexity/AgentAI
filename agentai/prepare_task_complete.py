@@ -14,7 +14,7 @@ from computergym import (
     OpenEndedWebsite,
     make_env,
 )
-from computergym.utils import save_str_obs
+from computergym.utils import save_str_to_file
 from prompts.utils import Response
 from tqdm import tqdm
 from utils import get_logger
