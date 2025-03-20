@@ -74,6 +74,6 @@ def action_to_response(action: BaseModel):
 
 def response_to_action(response: Response) -> BaseModel:
     action_params = response.action_params
-    action_object = string_to_action_type(response.action_name)
+    action_object = string_to_action_type[response.action_name]
     action = action_object.model_validate(action_params)
     return action

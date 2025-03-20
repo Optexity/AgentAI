@@ -1,7 +1,7 @@
 import json
 import logging
 
-from computergym import Observation, OpenEndedWebsite, custom_json_schema
+from computergym import Observation, OpenEndedWebsite
 from pydantic import BaseModel
 
 from .models import GeminiModels, VLLMModels, get_llm_model
@@ -10,6 +10,21 @@ from .prompts.utils import PromptKeys, PromptStyle, Response, Roles, style
 from .utils import response_to_action
 
 logger = logging.getLogger(__name__)
+
+
+def custom_json_schema(action_function: type[BaseModel]) -> dict:
+    schema = action_function.model_json_schema()
+    return {
+        "action_name": action_function.__name__,
+        "action_description": schema.get("description", action_function.__name__),
+        "action_params": {
+            field: {
+                "param_description": schema["properties"][field]["description"],
+                "param_type": schema["properties"][field]["type"],
+            }
+            for field in schema["properties"]
+        },
+    }
 
 
 def get_action_space_prompt(action_space: list[BaseModel]) -> str:
