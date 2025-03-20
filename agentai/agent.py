@@ -3,11 +3,11 @@ import logging
 
 from computergym import ActionTypes, Observation, OpenEndedWebsite, get_action_signature
 from computergym.actions.action import ActionTypes
-from models import GeminiModels, VLLMModels, get_llm_model
-from prompts.prompts import system_prompt, user_prompt
-from prompts.utils import PromptKeys, PromptStyle, Response, Roles, style
 from pydantic import BaseModel
 
+from .models import GeminiModels, VLLMModels, get_llm_model
+from .prompts.prompts import system_prompt, user_prompt
+from .prompts.utils import PromptKeys, PromptStyle, Response, Roles, style
 from .utils import response_to_action
 
 logger = logging.getLogger(__name__)

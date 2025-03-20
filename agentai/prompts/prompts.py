@@ -1,4 +1,4 @@
-from .prompts_basic import (
+from .prompt_definitions import (
     click_example_response,
     format_instruction,
     input_text_example_response,

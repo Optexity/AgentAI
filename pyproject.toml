@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentai"
+version = "0.1.0"
+description = "agents for browser and computer"
+authors = [{ name = "Sankalp Garg", email = "authors@reinforcealignai.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "litellm",
+    "matplotlib",
+    "instructor",
+    "playwright==1.44.0",
+    "google-generativeai",
+]

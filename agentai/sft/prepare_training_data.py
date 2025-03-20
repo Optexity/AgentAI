@@ -1,12 +1,13 @@
 import argparse
+import json
 import os
 
 import yaml
-from agent import BasicAgent
+from agentai.agent import BasicAgent
+from agentai.models import GeminiModels
+from agentai.utils import action_to_response
 from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
 from computergym.envs.browser import History
-from models import GeminiModels
-from utils import action_to_response
 
 SAVE_DIR = "save_dir"
 TASKS = "tasks"
@@ -16,21 +17,15 @@ URL = "url"
 PROCESSED_OUTPUT_DIR = "processed_output_dir"
 
 
-def read_file(file_path):
-    with open(file_path, "r") as f:
-        data = f.read().strip()
-    return data
-
-
 def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
 
-    full_data = []
-
+    task_data = []
     agent = BasicAgent(GeminiModels.GEMINI_2_0_FLASH, env, False)
-
     history_list = History.read_history(processed_output_dir)
 
     for history in history_list:
+        history.obs.goal = env.goal
+        history.obs.url = env.url
         messages = agent.get_input_messages(history.obs)
         system_message = messages[0]["content"]
         user_message = messages[1]["content"]
@@ -39,7 +34,7 @@ def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
 
         # TODO: augment so that agent can learn with and without history
         agent.response_history.append(target_response)
-        full_data.append(
+        task_data.append(
             {
                 "system": system_message,
                 "instruction": user_message,
@@ -47,9 +42,10 @@ def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
                 "output": target,
             }
         )
+    return task_data
 
 
-def main(yaml_file_path: str):
+def main(yaml_file_path: str, save_dir: str):
     with open(yaml_file_path, "r") as file:
         data = yaml.safe_load(file)
 
@@ -62,6 +58,7 @@ def main(yaml_file_path: str):
         headless=True,
     )
 
+    all_data = []
     for task in data[TASKS]:
         task_name = task[TASK_NAME]
         env.goal = task[DESCRIPTION]
@@ -69,14 +66,18 @@ def main(yaml_file_path: str):
         processed_output_dir = os.path.join(
             data[SAVE_DIR], task_name, data[PROCESSED_OUTPUT_DIR]
         )
-        get_input_output(env, processed_output_dir)
+        task_data = get_input_output(env, processed_output_dir)
+        all_data.extend(task_data)
+
+    os.makedirs(save_dir, exist_ok=True)
+    output_file = os.path.join(save_dir, "training_data.json")
+    with open(output_file, "w") as f:
+        json.dump(all_data, f, indent=4)
 
 
 if __name__ == "__main__":
-    main("/Users/sankalp/repository/github/AWS_DATA/trajectorybucket/trace_profiling")
-    exit()
     parser = argparse.ArgumentParser(description="Prepare Lamma Factory Data")
-    parser.add_argument("--input", type=str, help="Input file path")
+    parser.add_argument("--yaml", type=str, help="Input file path")
     parser.add_argument("--output", type=str, help="Output file path")
     args = parser.parse_args()
-    main()
+    main(args.yaml, args.output)

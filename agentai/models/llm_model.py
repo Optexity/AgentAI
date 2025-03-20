@@ -2,7 +2,7 @@ import ast
 import re
 from enum import Enum, unique
 
-from prompts.utils import Response
+from agentai.prompts.utils import Response
 
 
 @unique
