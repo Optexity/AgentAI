@@ -1,0 +1,63 @@
+agent_dir: "/Users/sankalp/repository/github/Reinforce-Align-AI/AgentAI/agentai/train_data"
+html_data_config: "/Users/sankalp/repository/github/Reinforce-Align-AI/ComputerGYM/computergym/demonstrations/dummy.yaml"
+
+agent_name: hubspot_lamma3.1_8B_Instruct
+
+model_name_or_path: meta-llama/Meta-Llama-3.1-8B-Instruct
+adapter_name_or_path: saves/llama3.1-8b/lora/sft/service_catalog_tasks
+template: llama3
+trust_remote_code: true
+context_length: 100000
+
+train_config:
+  ### model
+  # model_name_or_path: meta-llama/Meta-Llama-3.1-8B-Instruct
+  # trust_remote_code: true
+
+  ### method
+  stage: sft
+  do_train: true
+  finetuning_type: lora
+  lora_rank: 8
+  lora_target: all
+
+  ### dataset
+  dataset: service_catalog_tasks
+  # template: llama3
+  # cutoff_len: 100000
+  max_samples: 100000
+  overwrite_cache: true
+  preprocessing_num_workers: 16
+
+  ### output
+  # output_dir: saves/llama3.1-8b/lora/sft/service_catalog_tasks
+  logging_steps: 10
+  save_steps: 74
+  plot_loss: true
+  overwrite_output_dir: true
+
+  ### train
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 8
+  learning_rate: 1.0e-4
+  num_train_epochs: 5
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.1
+  bf16: true
+  ddp_timeout: 180000000
+
+  ### eval
+  # eval_dataset: alpaca_en_demo
+  # val_size: 0.1
+  # per_device_eval_batch_size: 1
+  # eval_strategy: steps
+  # eval_steps: 500
+
+inference_config:
+  # model_name_or_path: meta-llama/Meta-Llama-3.1-8B-Instruct
+  # adapter_name_or_path: saves/llama3.1-8b/lora/sft/service_catalog_tasks
+  # vllm_maxlen: 100000
+  # template: llama3
+  infer_backend: vllm # choices: [huggingface, vllm]
+  vllm_enforce_eager: true
+  # trust_remote_code: true

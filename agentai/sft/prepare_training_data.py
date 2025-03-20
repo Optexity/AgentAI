@@ -9,12 +9,35 @@ from agentai.utils import action_to_response
 from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
 from computergym.envs.browser import History
 
-SAVE_DIR = "save_dir"
-TASKS = "tasks"
-TASK_NAME = "task_name"
-DESCRIPTION = "description"
-URL = "url"
-PROCESSED_OUTPUT_DIR = "processed_output_dir"
+
+def save_train_config(agent_config: dict, save_dir: str):
+
+    train_config = agent_config["train_config"]
+    train_config["model_name_or_path"] = agent_config["model_name_or_path"]
+    train_config["output_dir"] = agent_config["adapter_name_or_path"]
+    train_config["trust_remote_code"] = agent_config["trust_remote_code"]
+    train_config["template"] = agent_config["template"]
+    train_config["cutoff_len"] = agent_config["context_length"]
+
+    os.makedirs(save_dir, exist_ok=True)
+    output_file = os.path.join(save_dir, "train_config.yaml")
+    with open(output_file, "w") as f:
+        yaml.safe_dump(train_config, f)
+
+
+def save_inference_config(agent_config: dict, save_dir: str):
+
+    inference_config = agent_config["inference_config"]
+    inference_config["model_name_or_path"] = agent_config["model_name_or_path"]
+    inference_config["adapter_name_or_path"] = agent_config["adapter_name_or_path"]
+    inference_config["trust_remote_code"] = agent_config["trust_remote_code"]
+    inference_config["template"] = agent_config["template"]
+    inference_config["vllm_maxlen"] = agent_config["context_length"]
+
+    os.makedirs(save_dir, exist_ok=True)
+    output_file = os.path.join(save_dir, "inference_config.yaml")
+    with open(output_file, "w") as f:
+        yaml.safe_dump(inference_config, f)
 
 
 def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
@@ -45,9 +68,12 @@ def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
     return task_data
 
 
-def main(yaml_file_path: str, save_dir: str):
+def main(yaml_file_path: str):
     with open(yaml_file_path, "r") as file:
-        data = yaml.safe_load(file)
+        agent_config = yaml.safe_load(file)
+
+    with open(agent_config["html_data_config"], "r") as file:
+        html_data_config = yaml.safe_load(file)
 
     env: OpenEndedWebsite = make_env(
         None,
@@ -59,25 +85,33 @@ def main(yaml_file_path: str, save_dir: str):
     )
 
     all_data = []
-    for task in data[TASKS]:
-        task_name = task[TASK_NAME]
-        env.goal = task[DESCRIPTION]
-        env.url = task[URL]
+    for task in html_data_config["tasks"]:
+        task_name = task["task_name"]
+        env.goal = task["description"]
+        env.url = task["url"]
         processed_output_dir = os.path.join(
-            data[SAVE_DIR], task_name, data[PROCESSED_OUTPUT_DIR]
+            html_data_config["save_dir"],
+            task_name,
+            html_data_config["processed_output_dir"],
         )
         task_data = get_input_output(env, processed_output_dir)
         all_data.extend(task_data)
+    env.close()
 
+    save_dir = os.path.join(
+        agent_config["agent_dir"], agent_config["agent_name"], "data"
+    )
     os.makedirs(save_dir, exist_ok=True)
     output_file = os.path.join(save_dir, "training_data.json")
     with open(output_file, "w") as f:
         json.dump(all_data, f, indent=4)
 
+    save_train_config(agent_config, save_dir)
+    save_inference_config(agent_config, save_dir)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Prepare Lamma Factory Data")
-    parser.add_argument("--yaml", type=str, help="Input file path")
-    parser.add_argument("--output", type=str, help="Output file path")
+    parser.add_argument("--agent_config", type=str, required=True)
     args = parser.parse_args()
-    main(args.yaml, args.output)
+    main(args.agent_config)
