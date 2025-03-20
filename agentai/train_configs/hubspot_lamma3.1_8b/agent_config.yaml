@@ -4,7 +4,7 @@ html_data_config: "/Users/sankalp/repository/github/Reinforce-Align-AI/ComputerG
 agent_name: hubspot_lamma3.1_8B_Instruct
 
 model_name_or_path: meta-llama/Meta-Llama-3.1-8B-Instruct
-adapter_name_or_path: saves/llama3.1-8b/lora/sft/
+adapter_name_or_path: saves/
 template: llama3
 trust_remote_code: true
 context_length: 100000

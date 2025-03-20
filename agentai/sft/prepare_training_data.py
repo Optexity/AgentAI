@@ -15,7 +15,11 @@ def save_train_config(agent_config: dict, save_dir: str):
     train_config = agent_config["train_config"]
     train_config["model_name_or_path"] = agent_config["model_name_or_path"]
     train_config["output_dir"] = os.path.join(
-        agent_config["adapter_name_or_path"], agent_config["agent_name"]
+        agent_config["adapter_name_or_path"],
+        agent_config["agent_name"],
+        agent_config["model_name_or_path"],
+        train_config["finetuning_type"],
+        train_config["stage"],
     )
     train_config["trust_remote_code"] = agent_config["trust_remote_code"]
     train_config["template"] = agent_config["template"]
@@ -30,12 +34,10 @@ def save_train_config(agent_config: dict, save_dir: str):
 
 
 def save_inference_config(agent_config: dict, save_dir: str):
-
+    train_config = agent_config["train_config"]
     inference_config = agent_config["inference_config"]
     inference_config["model_name_or_path"] = agent_config["model_name_or_path"]
-    inference_config["adapter_name_or_path"] = os.path.join(
-        agent_config["adapter_name_or_path"], agent_config["agent_name"]
-    )
+    inference_config["adapter_name_or_path"] = train_config["output_dir"]
     inference_config["trust_remote_code"] = agent_config["trust_remote_code"]
     inference_config["template"] = agent_config["template"]
     inference_config["vllm_maxlen"] = agent_config["context_length"]
