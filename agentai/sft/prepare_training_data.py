@@ -14,10 +14,14 @@ def save_train_config(agent_config: dict, save_dir: str):
 
     train_config = agent_config["train_config"]
     train_config["model_name_or_path"] = agent_config["model_name_or_path"]
-    train_config["output_dir"] = agent_config["adapter_name_or_path"]
+    train_config["output_dir"] = os.path.join(
+        agent_config["adapter_name_or_path"], agent_config["agent_name"]
+    )
     train_config["trust_remote_code"] = agent_config["trust_remote_code"]
     train_config["template"] = agent_config["template"]
     train_config["cutoff_len"] = agent_config["context_length"]
+    train_config["dataset"] = agent_config["agent_name"]
+    train_config["run_name"] = agent_config["agent_name"]
 
     os.makedirs(save_dir, exist_ok=True)
     output_file = os.path.join(save_dir, "train_config.yaml")
@@ -29,7 +33,9 @@ def save_inference_config(agent_config: dict, save_dir: str):
 
     inference_config = agent_config["inference_config"]
     inference_config["model_name_or_path"] = agent_config["model_name_or_path"]
-    inference_config["adapter_name_or_path"] = agent_config["adapter_name_or_path"]
+    inference_config["adapter_name_or_path"] = os.path.join(
+        agent_config["adapter_name_or_path"], agent_config["agent_name"]
+    )
     inference_config["trust_remote_code"] = agent_config["trust_remote_code"]
     inference_config["template"] = agent_config["template"]
     inference_config["vllm_maxlen"] = agent_config["context_length"]
@@ -98,9 +104,7 @@ def main(yaml_file_path: str):
         all_data.extend(task_data)
     env.close()
 
-    save_dir = os.path.join(
-        agent_config["agent_dir"], agent_config["agent_name"], "data"
-    )
+    save_dir = os.path.join(agent_config["agent_dir"], agent_config["agent_name"])
     os.makedirs(save_dir, exist_ok=True)
     output_file = os.path.join(save_dir, "training_data.json")
     with open(output_file, "w") as f:
