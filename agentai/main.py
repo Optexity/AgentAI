@@ -56,7 +56,7 @@ def run(
 
         logger.info(f"model_response: {model_response}")
         string = action.model_dump()
-        string["action_name"] = action.__class__.__name__
+        string["action_name"] = action.__name__
         logger.info(f"action: {string}")
         obs, reward, terminated, truncated, info = env.step(action)
         logger.info(

@@ -94,7 +94,7 @@ def main2(
             exit()
             pass
 
-    if sequences[-1]["action"].__class__.__name__ == "TaskComplete":
+    if sequences[-1]["action"].__name__ == "TaskComplete":
         print(f"Task complete: {task_sub_type} {seed}")
         return
 

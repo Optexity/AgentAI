@@ -43,6 +43,7 @@ class BasicAgent:
             PromptKeys.NEXT_STEP,
             PromptKeys.PREVIOUS_RESPONSES,
         ]
+        # TODO: change this to chat style so that it can be cached
         messages = [
             {"role": Roles.SYSTEM, "content": self.system_prompt},
             {

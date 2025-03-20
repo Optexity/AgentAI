@@ -67,9 +67,7 @@ def get_logger(
 
 def action_to_response(action: BaseModel):
     ## TODO: correct class name
-    return Response(
-        action_name=action.__class__.__name__, action_params=action.model_dump()
-    )
+    return Response(action_name=action.__name__, action_params=action.model_dump())
 
 
 def response_to_action(response: Response) -> BaseModel:
