@@ -8,6 +8,7 @@ from agentai.prompts.utils import Response
 @unique
 class GeminiModels(Enum):
     GEMINI_2_0_FLASH = "gemini-2.0-flash"
+    TUNED_MODELS_HUBSPOT_V1 = "hubspotv1-pga2a8p0hgrq"
 
 
 @unique

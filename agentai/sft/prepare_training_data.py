@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 
+import pandas as pd
 import yaml
 from agentai.agent import BasicAgent
 from agentai.models import GeminiModels
@@ -76,6 +77,25 @@ def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
     return task_data
 
 
+def save_llama_factory_data(all_data: list, save_dir: str):
+    output_file = os.path.join(save_dir, "llama_factory_training_data.json")
+    with open(output_file, "w") as f:
+        json.dump(all_data, f, indent=4)
+
+
+def save_gemini_data(all_data: list, save_dir: str):
+    new_data = [
+        {
+            "input": f"""{item['system']}\n{item['instruction']}\n{item['input']}""",
+            "output": item["output"],
+        }
+        for item in all_data
+    ]
+    new_data = pd.DataFrame(new_data)
+    output_file = os.path.join(save_dir, "gemini_training_data.csv")
+    new_data.to_csv(output_file, index=False, quoting=1)
+
+
 def main(yaml_file_path: str):
     with open(yaml_file_path, "r") as file:
         agent_config = yaml.safe_load(file)
@@ -108,10 +128,9 @@ def main(yaml_file_path: str):
 
     save_dir = os.path.join(agent_config["agent_dir"], agent_config["agent_name"])
     os.makedirs(save_dir, exist_ok=True)
-    output_file = os.path.join(save_dir, "training_data.json")
-    with open(output_file, "w") as f:
-        json.dump(all_data, f, indent=4)
 
+    save_llama_factory_data(all_data, save_dir)
+    save_gemini_data(all_data, save_dir)
     save_train_config(agent_config, save_dir)
     save_inference_config(agent_config, save_dir)
 

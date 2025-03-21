@@ -1,10 +1,16 @@
 import logging
 
+from agentai.models import GeminiModels, VLLMModels, get_llm_model
+from agentai.prompts import (
+    PromptKeys,
+    Response,
+    Roles,
+    get_system_prompt,
+    get_user_prompt,
+)
+from agentai.utils import response_to_action
 from computergym import Observation, OpenEndedWebsite
-from models import GeminiModels, VLLMModels, get_llm_model
-from prompts import PromptKeys, Response, Roles, get_system_prompt, get_user_prompt
 from pydantic import BaseModel
-from utils import response_to_action
 
 logger = logging.getLogger(__name__)
 

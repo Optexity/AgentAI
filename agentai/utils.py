@@ -2,8 +2,8 @@ import logging
 import os
 import sys
 
+from agentai.prompts import Response
 from computergym.actions.action import string_to_action_type
-from prompts import Response
 from pydantic import BaseModel
 
 

@@ -20,7 +20,10 @@ class Gemini(LLMModel):
                 mode=instructor.Mode.GEMINI_JSON,
             )
         else:
-            self.model_name = f"gemini/{model_name.value}"
+            if model_name == GeminiModels.TUNED_MODELS_HUBSPOT_V1:
+                self.model_name = f"tunedModels/{model_name.value}"
+            else:
+                self.model_name = f"gemini/{model_name.value}"
 
     def get_model_response(self, messages: list[dict]) -> Response:
         if self.use_instructor:
