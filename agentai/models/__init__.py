@@ -14,4 +14,4 @@ def get_llm_model(
 
         return LlamaFactoryVllm(model_name, use_instructor, port)
 
-    raise ValueError(f"Invalid model type: {model_type}")
+    raise ValueError(f"Invalid model type")

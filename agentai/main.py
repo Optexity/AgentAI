@@ -1,12 +1,13 @@
 import argparse
 import json
 import os
+import time
 
-from agent import BasicAgent
+from agentai.agent import BasicAgent
+from agentai.models import GeminiModels, VLLMModels
+from agentai.utils import get_logger
 from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
 from computergym.utils import save_str_to_file
-from models import GeminiModels, VLLMModels
-from utils import get_logger
 
 
 def run(
@@ -29,9 +30,12 @@ def run(
         headless=headless,
         # proxy="http://38.154.227.167:5868",
     )
-    agent = BasicAgent(GeminiModels.GEMINI_2_0_FLASH, env, False, port)
+    agent = BasicAgent(GeminiModels.TUNED_MODELS_HUBSPOT_V1, env, False, port)
 
     obs, info = env.reset()
+    breakpoint()
+    env.obs = env.get_obs()
+    obs = env.obs
 
     while True:
         logger.info("-" * 20)
