@@ -16,6 +16,6 @@ conda activate browsergym
 
 cd LLaMA-Factory
 export WANDB_API_KEY="ac9187c6c3c683b2a0b2b5193b5e64fb403bdc40";
-llamafactory-cli train data/train_data/hubspot_agent/meta-llama/Meta-Llama-3.1-8B-Instruct/train_config2.yaml
+llamafactory-cli train data/train_data/hubspot_agent/Qwen/Qwen2.5-7B-Instruct-1M/train_config2.yaml
 
 echo "Done"
