@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=llamma3_train
+#SBATCH --job-name=qwne_train
 #SBATCH --output=/data/user_data/sachingo/Reinforce-Align-AI/slurm_outputs/%x/%A_%a.out  # Standard output
 #SBATCH --error=/data/user_data/sachingo/Reinforce-Align-AI/slurm_outputs/%x/%A_%a.err   # Standard error
 #SBATCH --partition=general
