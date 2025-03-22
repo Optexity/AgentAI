@@ -51,7 +51,6 @@ def save_inference_config(agent_config: dict, save_dir: str):
 
 
 def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
-
     task_data = []
     agent = BasicAgent(GeminiModels.GEMINI_2_0_FLASH, env, False)
     history_list = History.read_history(processed_output_dir)
@@ -129,7 +128,8 @@ def main(yaml_file_path: str):
             seed_dir = os.path.join(processed_output_dir, seed)
             if not os.path.isdir(seed_dir):
                 continue
-            task_data = get_input_output(env, processed_output_dir)
+
+            task_data = get_input_output(env, seed_dir)
             all_data.extend(task_data)
     env.close()
 
