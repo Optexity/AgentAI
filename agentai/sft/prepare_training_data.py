@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+from copy import deepcopy
 
 import pandas as pd
 import yaml
@@ -14,40 +15,40 @@ from tqdm import tqdm
 
 def save_train_config(agent_config: dict, save_dir: str):
 
-    train_config = agent_config["train_config"]
-    train_config["model_name_or_path"] = agent_config["model_name_or_path"]
-    train_config["output_dir"] = os.path.join(
-        agent_config["adapter_name_or_path"],
-        agent_config["agent_name"],
-        agent_config["model_name_or_path"],
-        train_config["finetuning_type"],
-        train_config["stage"],
-    )
-    train_config["trust_remote_code"] = agent_config["trust_remote_code"]
-    train_config["template"] = agent_config["template"]
-    train_config["cutoff_len"] = agent_config["context_length"]
-    train_config["dataset"] = agent_config["agent_name"]
-    train_config["run_name"] = agent_config["agent_name"]
+    for model_config in agent_config["models"]:
+        train_config = deepcopy(agent_config["train_config"])
+        inference_config = deepcopy(agent_config["inference_config"])
 
-    os.makedirs(save_dir, exist_ok=True)
-    output_file = os.path.join(save_dir, "train_config.yaml")
-    with open(output_file, "w") as f:
-        yaml.safe_dump(train_config, f)
+        train_config["model_name_or_path"] = model_config["model_name_or_path"]
+        train_config["output_dir"] = os.path.join(
+            model_config["adapter_name_or_path"],
+            agent_config["agent_name"],
+            model_config["model_name_or_path"],
+            train_config["finetuning_type"],
+            train_config["stage"],
+        )
+        train_config["trust_remote_code"] = model_config["trust_remote_code"]
+        train_config["template"] = model_config["template"]
+        train_config["cutoff_len"] = model_config["context_length"]
+        train_config["dataset"] = agent_config["agent_name"]
+        train_config["run_name"] = agent_config["agent_name"]
 
+        inference_config["model_name_or_path"] = model_config["model_name_or_path"]
+        inference_config["adapter_name_or_path"] = train_config["output_dir"]
+        inference_config["trust_remote_code"] = model_config["trust_remote_code"]
+        inference_config["template"] = model_config["template"]
+        inference_config["vllm_maxlen"] = model_config["context_length"]
 
-def save_inference_config(agent_config: dict, save_dir: str):
-    train_config = agent_config["train_config"]
-    inference_config = agent_config["inference_config"]
-    inference_config["model_name_or_path"] = agent_config["model_name_or_path"]
-    inference_config["adapter_name_or_path"] = train_config["output_dir"]
-    inference_config["trust_remote_code"] = agent_config["trust_remote_code"]
-    inference_config["template"] = agent_config["template"]
-    inference_config["vllm_maxlen"] = agent_config["context_length"]
+        final_save_dir = os.path.join(save_dir, model_config["model_name_or_path"])
+        os.makedirs(final_save_dir, exist_ok=True)
 
-    os.makedirs(save_dir, exist_ok=True)
-    output_file = os.path.join(save_dir, "inference_config.yaml")
-    with open(output_file, "w") as f:
-        yaml.safe_dump(inference_config, f)
+        output_file = os.path.join(final_save_dir, "train_config.yaml")
+        with open(output_file, "w") as f:
+            yaml.safe_dump(train_config, f)
+
+        output_file = os.path.join(final_save_dir, "inference_config.yaml")
+        with open(output_file, "w") as f:
+            yaml.safe_dump(inference_config, f)
 
 
 def get_input_output(env: OpenEndedWebsite, processed_output_dir: str):
@@ -138,8 +139,9 @@ def main(yaml_file_path: str):
 
     save_llama_factory_data(all_data, save_dir)
     save_gemini_data(all_data, save_dir)
+
     save_train_config(agent_config, save_dir)
-    save_inference_config(agent_config, save_dir)
+    # save_inference_config(agent_config, save_dir)
 
 
 if __name__ == "__main__":
