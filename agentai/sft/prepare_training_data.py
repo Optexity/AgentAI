@@ -9,6 +9,7 @@ from agentai.models import GeminiModels
 from agentai.utils import action_to_response
 from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
 from computergym.envs.browser import History
+from tqdm import tqdm
 
 
 def save_train_config(agent_config: dict, save_dir: str):
@@ -113,7 +114,7 @@ def main(yaml_file_path: str):
     )
 
     all_data = []
-    for task in html_data_config["tasks"]:
+    for task in tqdm(html_data_config["tasks"]):
         task_name = task["task_name"]
         env.goal = task["description"]
         env.url = task["url"]
@@ -122,8 +123,14 @@ def main(yaml_file_path: str):
             task_name,
             html_data_config["processed_output_dir"],
         )
-        task_data = get_input_output(env, processed_output_dir)
-        all_data.extend(task_data)
+        for seed in os.listdir(processed_output_dir):
+            if not seed.startswith("seed-"):
+                continue
+            seed_dir = os.path.join(processed_output_dir, seed)
+            if not os.path.isdir(seed_dir):
+                continue
+            task_data = get_input_output(env, processed_output_dir)
+            all_data.extend(task_data)
     env.close()
 
     save_dir = os.path.join(agent_config["agent_dir"], agent_config["agent_name"])
