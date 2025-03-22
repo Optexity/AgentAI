@@ -22,9 +22,11 @@ class BasicAgent:
         env: OpenEndedWebsite,
         use_instructor: bool = False,
         port: int = None,
+        allow_search: bool = True,
     ):
         self.model_name = model_name
         self.use_instructor = use_instructor
+        self.allow_search = allow_search
         self.action_space = env.get_action_space()
         self.system_prompt = get_system_prompt(
             [
@@ -39,6 +41,11 @@ class BasicAgent:
         self.response_history: list[Response] = []
 
         self.model = get_llm_model(model_name, use_instructor=use_instructor, port=port)
+
+    def preprocess_obs(self, obs: Observation) -> Observation:
+        obs.axtree = "\n".join(
+            [a for a in obs.axtree.split("\n") if "search" not in a.lower()]
+        )
 
     def get_input_messages(self, obs: Observation) -> list[dict]:
         keys = [
@@ -59,6 +66,8 @@ class BasicAgent:
         return messages
 
     def get_next_action(self, obs: Observation) -> tuple[Response, BaseModel]:
+        if not self.allow_search:
+            self.preprocess_obs(obs)
         input_messages = self.get_input_messages(obs)
         model_response = self.model.get_model_response(input_messages)
         self.response_history.append(model_response)

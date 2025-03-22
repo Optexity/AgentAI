@@ -30,7 +30,9 @@ def run(
         headless=headless,
         # proxy="http://38.154.227.167:5868",
     )
-    agent = BasicAgent(GeminiModels.TUNED_MODELS_HUBSPOT_V1, env, False, port)
+    agent = BasicAgent(
+        GeminiModels.GEMINI_2_0_FLASH, env, False, port, allow_search=False
+    )
 
     obs, info = env.reset()
     breakpoint()
