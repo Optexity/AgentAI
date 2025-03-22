@@ -31,7 +31,7 @@ def save_train_config(agent_config: dict, save_dir: str):
         train_config["template"] = model_config["template"]
         train_config["cutoff_len"] = model_config["context_length"]
         train_config["dataset"] = agent_config["agent_name"]
-        train_config["run_name"] = agent_config["agent_name"]
+        train_config["run_name"] = train_config["output_dir"]
 
         inference_config["model_name_or_path"] = model_config["model_name_or_path"]
         inference_config["adapter_name_or_path"] = train_config["output_dir"]
