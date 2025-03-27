@@ -10,34 +10,29 @@ from computergym import BrowserEnvTypes, EnvTypes, OpenEndedWebsite, make_env
 from computergym.utils import save_str_to_file
 
 
-def run(
-    goal: str,
-    url: str,
-    log_path="./logs",
-    log_to_console=False,
-    headless=False,
-    port=None,
-):
+def run(args):
+    os.makedirs(args.log_path, exist_ok=True)
 
-    logger = get_logger(__name__, log_path=log_path, log_to_console=log_to_console)
+    logger = get_logger(
+        __name__, log_path=args.log_path, log_to_console=args.log_to_console
+    )
 
     env: OpenEndedWebsite = make_env(
-        url,
+        args.url,
         EnvTypes.browser,
         BrowserEnvTypes.openended,
-        cache_dir=log_path,
-        goal_message=goal,
-        headless=headless,
+        cache_dir=args.log_path,
+        goal_message=args.goal,
+        headless=args.headless,
         # proxy="http://38.154.227.167:5868",
+        storage_state=args.storage_state,
     )
-    agent = BasicAgent(
-        GeminiModels.GEMINI_2_0_FLASH, env, False, port, allow_search=False
-    )
+    if args.model == "vllm":
+        agent = BasicAgent(VLLMModels.LLAMA_3_1_8B_INSTRUCT, env, False, args.port)
+    else:
+        agent = BasicAgent(GeminiModels.GEMINI_2_0_FLASH, env, False, args.port)
 
     obs, info = env.reset()
-    breakpoint()
-    env.obs = env.get_obs()
-    obs = env.obs
 
     while True:
         logger.info("-" * 20)
@@ -47,8 +42,8 @@ def run(
             break
         model_response, action = agent.get_next_action(obs)
 
-        if log_path:
-            cache_dir = os.path.join(log_path, f"step-{env.current_step}")
+        if args.log_path:
+            cache_dir = os.path.join(args.log_path, f"step-{env.current_step}")
             os.makedirs(cache_dir, exist_ok=True)
             string = model_response.model_dump()
             string = json.dumps(string, indent=4)
@@ -67,18 +62,6 @@ def run(
     env.close()
 
 
-def main(args):
-    os.makedirs(args.log_path, exist_ok=True)
-    run(
-        args.goal,
-        args.url,
-        args.log_path,
-        args.log_to_console,
-        args.headless,
-        args.port,
-    )
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the browser gym tasks.")
     parser.add_argument("--goal", type=str, required=True)
@@ -87,8 +70,10 @@ if __name__ == "__main__":
     parser.add_argument("--log_to_console", action="store_true", default=False)
     parser.add_argument("--headless", action="store_true", default=False)
     parser.add_argument("--port", type=int, default=None)
+    parser.add_argument("--storage_state", type=str, default=None)
+    parser.add_argument("--model", type=str, choices=["gemini", "vllm"], required=True)
     args = parser.parse_args()
     try:
-        main(args)
+        run(args)
     except Exception as e:
         print(f"Error: {e}")

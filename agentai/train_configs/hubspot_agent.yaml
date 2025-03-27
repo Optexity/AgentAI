@@ -1,5 +1,5 @@
-agent_dir: "/Users/sankalp/repository/github/train_data"
-html_data_config: "/Users/sankalp/repository/github/Reinforce-Align-AI/ComputerGYM/computergym/demonstrations/dummy.yaml"
+agent_dir: "train_data"
+html_data_config: "ComputerGYM/computergym/demonstrations/demonstration_config.yaml"
 
 agent_name: hubspot_agent
 
